@@ -1,0 +1,11 @@
+body{
+  padding: 0;
+}
+.home{
+  background-color: pink;
+  height: 100vh;
+}
+.bg{
+  background-color: blueviolet;
+  height: 40vh;
+}
