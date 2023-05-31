@@ -2,7 +2,7 @@ import os
 
 import uvicorn
 from fastapi import FastAPI
-from sqlalchemy import Integer, Column, String, Date, ForeignKey, Float, func, extract, text
+from sqlalchemy import Integer, Column, String, Date, ForeignKey, Float, func, text, DateTime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
@@ -15,18 +15,6 @@ engine = create_engine('access+pyodbc:///?odbc_connect='
 Session = sessionmaker(bind=engine)
 session = Session()
 Base = declarative_base()
-
-
-class RequestFirst:
-    def __init__(self):
-        self.query_text = '''
-        SELECT "Объекты недвижимости"."Уникальный индикатор", "Тип объекта", "Район", "Адрес", "Площадь", "Стоимость недвижимости"
-        FROM "Объекты недвижимости"
-        JOIN "Типы объектов" ON "Объекты недвижимости"."Тип объекта" = "Типы объектов"."Уникальный индикатор"
-        JOIN "Районы" ON "Объекты недвижимости"."Район" = "Районы"."Уникальный индикатор"
-        WHERE "Стоимость недвижимости" > 0;
-        '''
-        self.query = text(self.query_text)
 
 
 class TypeObj(Base):
@@ -85,10 +73,9 @@ class Sdelka(Base):
                  nullable=False)
     buy_people = Column("Покупатель", Integer, ForeignKey("Покупатели.Уникальный индикатор"), nullable=False)
     ceil_people = Column("Продавец", Integer, ForeignKey("Продавцы.Уникальный индикатор"), nullable=False)
-    date = Column("Дата сделки", Date, nullable=False)
+    date = Column("Дата сделки", DateTime, nullable=False)
 
 
-session.add(RequestFirst())
 Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
@@ -358,25 +345,34 @@ def get_obj_ceil():
 
 @app.get('/get_saldo')
 def get_saldo():
-    saldo_by_type_obj = session.query(TypeObj.type, func.sum(Sdelka.cost).label("saldo")). \
-        join(Obj, TypeObj.id == Obj.type_obj). \
-        join(Sdelka, Obj.id == Sdelka.obj). \
-        group_by(TypeObj.type).all()
-    return saldo_by_type_obj
+    balance = session.query(Obj.type_obj, func.sum(Obj.cost)). \
+        filter(Sdelka.id != None). \
+        group_by(Obj.type_obj).all()
+    return balance
 
 
 @app.get('/get_obj_min_max')
 def get_obj_min_max(min_cost: int, max_cost: int):
-    return [get_obj(id_obj=x.id) for x in session.query(Obj).where(min_cost < Obj.cost < max_cost).all()]
+    objects = session.query(Obj).filter(Obj.cost >= min_cost, Obj.cost <= max_cost).all()
+    return objects
 
 
-@app.get('get_sales_by_raion')
+@app.get('/get_sales_by_raion')
 def get_sales_by_raion():
-    sales_by_raion = session.query(Raion.raion, extract('month', Sdelka.date), func.count(Sdelka.id)). \
-        join(Obj, Raion.id == Obj.raion). \
-        join(Sdelka, Obj.id == Sdelka.obj). \
-        group_by(Raion.raion, extract('month', Sdelka.date)).all()
-    return sales_by_raion
+    sales = session.query(Raion.raion, text("YEAR(Sdelka.date)"), func.count(Sdelka.id)). \
+        join(Obj, Obj.raion == Raion.id). \
+        join(Sdelka, Sdelka.obj == Obj.id). \
+        group_by(Raion.raion, text("YEAR(Sdelka.date)")).all()
+    return sales
+
+
+@app.get("/get_buyers_and_sellers")
+def get_buyers_and_sellers():
+    buy_people = session.query(BuyPeople.name, BuyPeople.surname, BuyPeople.otch).subquery()
+    ceil_people = session.query(CeilPeople.name, CeilPeople.surname, CeilPeople.otch).subquery()
+    all_people = session.query(buy_people.c.name, buy_people.c.surname, buy_people.c.otch). \
+        union(session.query(ceil_people.c.name, ceil_people.c.surname, ceil_people.c.otch)).all()
+    return all_people
 
 
 if __name__ == '__main__':
