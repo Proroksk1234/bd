@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from sqlalchemy import text
 
@@ -133,6 +134,10 @@ async def crud_post_peoples(data: dict, db):
 
 
 async def crud_post_deals(data: dict, db):
+    for key, value in data.items():
+        if isinstance(value, datetime):
+            data[key] = value.isoformat()
+
     fields = ','.join(data.keys())
     placeholders = ','.join(f':{key}' for key in data.keys())
     query_text = f"INSERT INTO deals ({fields}) VALUES ({placeholders})"
