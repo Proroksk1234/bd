@@ -59,8 +59,8 @@ async def crud_get_peoples(db, people_type_id, id_obj=None):
         query = text("SELECT * FROM peoples WHERE id = :id_obj and people_type_id = :people_type_id")
         result = await db.execute(query, {"id_obj": id_obj}, {"people_type_id": people_type_id})
     else:
-        query = text("SELECT * From peoples")
-        result = await db.execute(query)
+        query = text("SELECT * From peoples WHERE people_type_id = :people_type_id")
+        result = await db.execute(query, {"people_type_id": people_type_id})
     return await crud_transform_json(result=result)
 
 

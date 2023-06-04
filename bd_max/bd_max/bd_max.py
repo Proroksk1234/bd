@@ -37,7 +37,7 @@ async def get_all_types_obj(db: AsyncSession = Depends(get_db)):
 
 #
 @bd.get('/get_type_obj/{id_obj}')
-async def get_type_obj(id_obj, db: AsyncSession = Depends(get_db)):
+async def get_type_obj(id_obj: int, db: AsyncSession = Depends(get_db)):
     return await crud_get_types_obj(db=db, id_obj=id_obj)
 
 
@@ -47,7 +47,7 @@ async def get_all_deal_types(db: AsyncSession = Depends(get_db)):
 
 
 @bd.get('/get_deal_types/{id_obj}')
-async def get_deal_types(id_obj, db: AsyncSession = Depends(get_db)):
+async def get_deal_types(id_obj: int, db: AsyncSession = Depends(get_db)):
     return await crud_get_deal_types(db=db, id_obj=id_obj)
 
 
@@ -57,7 +57,7 @@ async def get_all_districts(db: AsyncSession = Depends(get_db)):
 
 
 @bd.get('/get_districts/{id_obj}')
-async def get_districts(id_obj, db: AsyncSession = Depends(get_db)):
+async def get_districts(id_obj: int, db: AsyncSession = Depends(get_db)):
     return await crud_get_districts(db=db, id_obj=id_obj)
 
 
@@ -72,7 +72,7 @@ async def get_all_real_estate_objects(db: AsyncSession = Depends(get_db)):
 
 
 @bd.get('/get_real_estate_objects/{id_obj}')
-async def get_real_estate_objects(id_obj, db: AsyncSession = Depends(get_db)):
+async def get_real_estate_objects(id_obj: int, db: AsyncSession = Depends(get_db)):
     return await crud_get_real_estate_objects(db=db, id_obj=id_obj)
 
 
@@ -82,7 +82,7 @@ async def get_all_buyers(db: AsyncSession = Depends(get_db)):
 
 
 @bd.get('/get_buyers/{id_obj}')
-async def get_buyers(id_obj, db: AsyncSession = Depends(get_db)):
+async def get_buyers(id_obj: int, db: AsyncSession = Depends(get_db)):
     return await crud_get_peoples(db=db, people_type_id=1, id_obj=id_obj)
 
 
@@ -92,7 +92,7 @@ async def get_all_salesman(db: AsyncSession = Depends(get_db)):
 
 
 @bd.get('/get_salesman/{id_obj}')
-async def get_salesman(id_obj, db: AsyncSession = Depends(get_db)):
+async def get_salesman(id_obj: int, db: AsyncSession = Depends(get_db)):
     return await crud_get_peoples(db=db, people_type_id=2, id_obj=id_obj)
 
 
