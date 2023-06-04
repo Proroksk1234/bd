@@ -9,7 +9,8 @@ from .crud import crud_get_types_obj, crud_get_deal_types, crud_get_districts, c
     crud_update_object_types, crud_update_real_estate_objects, crud_update_districts, crud_update_deal_types, \
     crud_update_people_types, crud_update_peoples, crud_update_deals, crud_delete_object_types, crud_delete_districts, \
     crud_delete_real_estate_objects, crud_delete_deal_types, crud_delete_people_types, crud_delete_peoples, \
-    crud_delete_deals, crud_get_all_types_columns, crud_add_columns, crud_delete_columns
+    crud_delete_deals, crud_get_all_types_columns, crud_add_columns, crud_delete_columns, select_all_object_sales, \
+    select_real_estate_objects_min_max_cost, select_buyers_salesman, select_dynamic_ceil, select_saldo
 
 bd = APIRouter()
 
@@ -224,3 +225,29 @@ async def add_columns(table_name: str = Body(...), column_name: str = Body(...),
 @bd.post("/delete_columns")
 async def delete_columns(table_name: str = Body(...), column_name: str = Body(...), db: AsyncSession = Depends(get_db)):
     await crud_delete_columns(table_name=table_name, column_name=column_name, db=db)
+
+
+@bd.get("/all_object_sales")
+async def all_object_sales(db: AsyncSession = Depends(get_db)):
+    return await select_all_object_sales(db=db)
+
+
+@bd.get("/saldo")
+async def saldo(db: AsyncSession = Depends(get_db)):
+    return await select_saldo(db=db)
+
+
+@bd.get("/dynamic_ceil")
+async def dynamic_ceil(db: AsyncSession = Depends(get_db)):
+    return await select_dynamic_ceil(db=db)
+
+
+@bd.get("/buyers_salesman")
+async def buyers_salesman(db: AsyncSession = Depends(get_db)):
+    return await select_buyers_salesman(db=db)
+
+
+@bd.get("/real_estate_objects_min_max_cost")
+async def real_estate_objects_min_max_cost(db: AsyncSession = Depends(get_db), min_cost: float = Body(...),
+                                           max_cost: float = Body(...)):
+    return await select_real_estate_objects_min_max_cost(db=db, min_cost=min_cost, max_cost=max_cost)

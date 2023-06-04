@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, Column, String, ForeignKey, Float, DateTime
+from sqlalchemy import Integer, Column, String, ForeignKey, Float, DateTime, Boolean
 
 from bd_max.db.connect_db import Base
 
@@ -23,6 +23,7 @@ class RealEstateObjects(Base):
     address = Column(String(255), nullable=False)
     square = Column(Float, nullable=False)
     cost = Column(Float, nullable=False)
+    sold = Column(Boolean, nullable=False)
 
 
 class DealTypes(Base):
