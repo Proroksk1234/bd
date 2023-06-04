@@ -243,3 +243,19 @@ async def crud_delete_deals(id_obj, db):
     query = text(query_text).bindparams(id_obj=id_obj)
     await db.execute(query)
     await db.commit()
+
+
+async def crud_get_all_types_columns():
+    return ['integer', 'varchar', 'boolean', "float", "date", "timestamp"]
+
+
+async def crud_add_columns(table_name, column_name, data_type, db):
+    query = text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {data_type}")
+    await db.execute(query)
+    await db.commit()
+
+
+async def crud_delete_columns(table_name, column_name, db):
+    query = text(f"ALTER TABLE {table_name} DROP COLUMN {column_name}")
+    await db.execute(query)
+    await db.commit()

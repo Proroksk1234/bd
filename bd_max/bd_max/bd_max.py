@@ -9,7 +9,7 @@ from .crud import crud_get_types_obj, crud_get_deal_types, crud_get_districts, c
     crud_update_object_types, crud_update_real_estate_objects, crud_update_districts, crud_update_deal_types, \
     crud_update_people_types, crud_update_peoples, crud_update_deals, crud_delete_object_types, crud_delete_districts, \
     crud_delete_real_estate_objects, crud_delete_deal_types, crud_delete_people_types, crud_delete_peoples, \
-    crud_delete_deals
+    crud_delete_deals, crud_get_all_types_columns, crud_add_columns, crud_delete_columns
 
 bd = APIRouter()
 
@@ -208,3 +208,19 @@ async def delete_peoples(id_obj: int, db: AsyncSession = Depends(get_db)):
 @bd.delete('/delete_deals/{id_obj}')
 async def delete_deals(id_obj: int, db: AsyncSession = Depends(get_db)):
     await crud_delete_deals(id_obj=id_obj, db=db)
+
+
+@bd.get("/get_all_types_columns")
+async def get_all_types_columns():
+    return await crud_get_all_types_columns()
+
+
+@bd.post("/add_columns")
+async def add_columns(table_name: str = Body(...), column_name: str = Body(...), data_type: str = Body(...),
+                      db: AsyncSession = Depends(get_db)):
+    await crud_add_columns(table_name=table_name, column_name=column_name, data_type=data_type, db=db)
+
+
+@bd.post("/delete_columns")
+async def delete_columns(table_name: str = Body(...), column_name: str = Body(...), db: AsyncSession = Depends(get_db)):
+    await crud_delete_columns(table_name=table_name, column_name=column_name, db=db)
