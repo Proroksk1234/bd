@@ -11,7 +11,7 @@ async def crud_get_types_obj(db, id_obj=None):
     else:
         query = text("SELECT * From object_types")
         result = await db.execute(query)
-    return await crud_transform_json(result=result)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def crud_get_deal_types(db, id_obj=None):
@@ -21,7 +21,7 @@ async def crud_get_deal_types(db, id_obj=None):
     else:
         query = text("SELECT * From deal_types")
         result = await db.execute(query)
-    return await crud_transform_json(result=result)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def crud_get_districts(db, id_obj=None):
@@ -31,7 +31,7 @@ async def crud_get_districts(db, id_obj=None):
     else:
         query = text("SELECT * From districts")
         result = await db.execute(query)
-    return await crud_transform_json(result=result)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def crud_get_people_types(db, id_obj=None):
@@ -41,7 +41,7 @@ async def crud_get_people_types(db, id_obj=None):
     else:
         query = text("SELECT * From people_types")
         result = await db.execute(query)
-    return await crud_transform_json(result=result)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def crud_get_real_estate_objects(db, id_obj=None):
@@ -51,17 +51,17 @@ async def crud_get_real_estate_objects(db, id_obj=None):
     else:
         query = text("SELECT * From real_estate_objects")
         result = await db.execute(query)
-    return await crud_transform_json(result=result)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def crud_get_peoples(db, people_type_id, id_obj=None):
     if id_obj:
         query = text("SELECT * FROM peoples WHERE id = :id_obj and people_type_id = :people_type_id")
-        result = await db.execute(query, {"id_obj": id_obj}, {"people_type_id": people_type_id})
+        result = await db.execute(query, {"id_obj": id_obj, "people_type_id": people_type_id})
     else:
         query = text("SELECT * From peoples WHERE people_type_id = :people_type_id")
         result = await db.execute(query, {"people_type_id": people_type_id})
-    return await crud_transform_json(result=result)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def crud_get_deals(db, id_obj=None):
@@ -71,7 +71,7 @@ async def crud_get_deals(db, id_obj=None):
     else:
         query = text("SELECT * From deals")
         result = await db.execute(query)
-    return await crud_transform_json(result=result)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def crud_transform_json(result):
@@ -80,6 +80,8 @@ async def crud_transform_json(result):
     rows_dict = []
     for row in rows:
         row_dict = dict(zip(columns, row))
+        if 'date' in row_dict:
+            row_dict['date'] = row_dict['date'].isoformat()
         rows_dict.append(row_dict)
     return json.loads(json.dumps(rows_dict))
 
@@ -315,3 +317,27 @@ async def select_real_estate_objects_min_max_cost(db, min_cost, max_cost):
     query = f"SELECT * FROM real_estate_objects WHERE cost BETWEEN {min_cost} AND {max_cost}"
     result = await db.execute(query)
     return await crud_transform_json(result=result)
+
+
+async def data_check(db, result):
+    for count, i in enumerate(result):
+        for _ in i:
+            if _ == 'obj_type_id':
+                result[count]['obj_type_id'] = await crud_get_types_obj(id_obj=result[count]['obj_type_id'], db=db)
+            elif _ == 'district_id':
+                result[count]['district_id'] = await crud_get_districts(id_obj=result[count]['district_id'], db=db)
+            elif _ == 'people_type_id':
+                result[count]['people_type_id'] = await crud_get_people_types(id_obj=result[count]['people_type_id'],
+                                                                              db=db)
+            elif _ == 'deal_type_id':
+                result[count]['deal_type_id'] = await crud_get_deal_types(id_obj=result[count]['deal_type_id'], db=db)
+            elif _ == 'real_estate_object_id':
+                result[count]['real_estate_object_id'] = await crud_get_real_estate_objects(
+                    id_obj=result[count]['real_estate_object_id'], db=db)
+            elif _ == 'buyer_id':
+                result[count]['buyer_id'] = await crud_get_peoples(id_obj=result[count]['buyer_id'], db=db,
+                                                                   people_type_id=1)
+            elif _ == 'salesman_id':
+                result[count]['salesman_id'] = await crud_get_peoples(id_obj=result[count]['salesman_id'], db=db,
+                                                                      people_type_id=2)
+    return result
