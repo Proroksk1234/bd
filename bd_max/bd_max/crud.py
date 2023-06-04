@@ -141,98 +141,105 @@ async def crud_post_deals(data: dict, db):
 
 
 async def crud_update_object_types(data: dict, id_obj, db):
-    query_text = f"UPDATE object_types SET {data} WHERE id=:id_obj"
-    query = text(query_text, {'id_obj': id_obj})
-    await db.execute(query, data)
+    set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
+    query_text = f"UPDATE object_types SET {set_clause} WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj, **data)
+    await db.execute(query)
     await db.commit()
 
 
 async def crud_update_districts(data: dict, id_obj, db):
-    query_text = f"UPDATE districts SET {data} WHERE id=:id_obj"
-    query = text(query_text, {'id_obj': id_obj})
-    await db.execute(query, data)
+    set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
+    query_text = f"UPDATE districts SET {set_clause} WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj, **data)
+    await db.execute(query)
     await db.commit()
 
 
 async def crud_update_real_estate_objects(data: dict, id_obj, db):
-    query_text = f"UPDATE real_estate_objects SET {data} WHERE id=:id_obj"
-    query = text(query_text, {'id_obj': id_obj})
-    await db.execute(query, data)
+    set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
+    query_text = f"UPDATE real_estate_objects SET {set_clause} WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj, **data)
+    await db.execute(query)
     await db.commit()
 
 
 async def crud_update_deal_types(data: dict, id_obj, db):
-    query_text = f"UPDATE deal_types SET {data} WHERE id=:id_obj"
-    query = text(query_text, {'id_obj': id_obj})
-    await db.execute(query, data)
+    set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
+    query_text = f"UPDATE deal_types SET {set_clause} WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj, **data)
+    await db.execute(query)
     await db.commit()
 
 
 async def crud_update_people_types(data: dict, id_obj, db):
-    query_text = f"UPDATE people_types SET {data} WHERE id=:id_obj"
-    query = text(query_text, {'id_obj': id_obj})
-    await db.execute(query, data)
+    set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
+    query_text = f"UPDATE people_types SET {set_clause} WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj, **data)
+    await db.execute(query)
     await db.commit()
 
 
 async def crud_update_peoples(data: dict, id_obj, db):
-    query_text = f"UPDATE peoples SET {data} WHERE id=:id_obj"
-    query = text(query_text, {'id_obj': id_obj})
-    await db.execute(query, data)
+    set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
+    query_text = f"UPDATE peoples SET {set_clause} WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj, **data)
+    await db.execute(query)
     await db.commit()
 
 
 async def crud_update_deals(data: dict, id_obj, db):
-    query_text = f"UPDATE deals SET {data} WHERE id=:id_obj"
-    query = text(query_text, {'id_obj': id_obj})
-    await db.execute(query, data)
+    set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
+    query_text = f"UPDATE deals SET {set_clause} WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj, **data)
+    await db.execute(query)
     await db.commit()
 
 
 async def crud_delete_object_types(id_obj, db):
     query_text = "DELETE FROM object_types WHERE id=:id_obj"
-    query = text(query_text, {'id_obj': id_obj})
+    query = text(query_text).bindparams(id_obj=id_obj)
     await db.execute(query)
     await db.commit()
 
 
 async def crud_delete_districts(id_obj, db):
     query_text = "DELETE FROM districts WHERE id=:id_obj"
-    query = text(query_text, {'id_obj': id_obj})
+    query = text(query_text).bindparams(id_obj=id_obj)
     await db.execute(query)
     await db.commit()
 
 
 async def crud_delete_real_estate_objects(id_obj, db):
     query_text = "DELETE FROM real_estate_objects WHERE id=:id_obj"
-    query = text(query_text, {'id_obj': id_obj})
+    query = text(query_text).bindparams(id_obj=id_obj)
     await db.execute(query)
     await db.commit()
 
 
 async def crud_delete_deal_types(id_obj, db):
     query_text = "DELETE FROM deal_types WHERE id=:id_obj"
-    query = text(query_text, {'id_obj': id_obj})
+    query = text(query_text).bindparams(id_obj=id_obj)
     await db.execute(query)
     await db.commit()
 
 
 async def crud_delete_people_types(id_obj, db):
     query_text = "DELETE FROM people_types WHERE id=:id_obj"
-    query = text(query_text, {'id_obj': id_obj})
+    query = text(query_text).bindparams(id_obj=id_obj)
     await db.execute(query)
     await db.commit()
 
 
 async def crud_delete_peoples(id_obj, db):
     query_text = "DELETE FROM peoples WHERE id=:id_obj"
-    query = text(query_text, {'id_obj': id_obj})
+    query = text(query_text).bindparams(id_obj=id_obj)
     await db.execute(query)
     await db.commit()
 
 
 async def crud_delete_deals(id_obj, db):
     query_text = "DELETE FROM deals WHERE id=:id_obj"
-    query = text(query_text, {'id_obj': id_obj})
+    query = text(query_text).bindparams(id_obj=id_obj)
     await db.execute(query)
     await db.commit()
