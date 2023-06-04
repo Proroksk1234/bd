@@ -7,7 +7,7 @@ if __name__ == '__main__':
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from bd_max.bd_max import bd
+from bd_max.bd_max.bd_max import bd
 from bd_max.configurate.config import PROJECT_NAME, VERSION, ORIGINS, ALLOWED_CREDENTIALS, ALLOWED_METHODS, \
     ALLOWED_HEADERS, OPENAPI_URL
 
