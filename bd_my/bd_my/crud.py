@@ -265,7 +265,7 @@ async def select_all_peoples_life(db, life_insurance_id):
     return await crud_transform_json(result=result)
 
 
-async def select_(db):
+async def select_received_for_clients(db):
     query = text("""
         SELECT peoples.id, peoples.name, peoples.surname, SUM(payments_under_the_contract.payments) AS total_payments,
         SUM(payments_under_the_contract.received) AS total_received
@@ -279,7 +279,7 @@ async def select_(db):
     return await crud_transform_json(result=result)
 
 
-async def select_dynamic_ceil(db, insurance_sum):
+async def select_objects_sum(db, insurance_sum):
     query = text("""
         SELECT objects_of_insurance.*
         FROM objects_of_insurance AS objects_of_insurance
@@ -289,12 +289,15 @@ async def select_dynamic_ceil(db, insurance_sum):
     return await crud_transform_json(result=result)
 
 
-async def select_buyers_salesman(db):
+async def select_dynamic_imprisonment(db):
     query = text("""
-        SELECT types_of_insurance.type_of_insurance, COUNT(insurance_activity.id) AS contracts_count, EXTRACT(YEAR_MONTH FROM insurance_activity.date) AS year_month
+        SELECT types_of_insurance.type_of_insurance, COUNT(insurance_activity.id) AS contracts_count, 
+        EXTRACT(YEAR_MONTH FROM insurance_activity.date) AS year_month
         FROM insurance_activity AS insurance_activity
-        JOIN objects_of_insurance AS objects_of_insurance ON insurance_activity.objects_of_insurance_id = objects_of_insurance.id
-        JOIN types_of_insurance AS types_of_insurance ON objects_of_insurance.type_of_insurance_id = types_of_insurance.id
+        JOIN objects_of_insurance AS objects_of_insurance ON 
+        insurance_activity.objects_of_insurance_id = objects_of_insurance.id
+        JOIN types_of_insurance AS types_of_insurance ON 
+        objects_of_insurance.type_of_insurance_id = types_of_insurance.id
         GROUP BY types_of_insurance.type_of_insurance, year_month
         ORDER BY year_month, types_of_insurance.type_of_insurance
         """)
@@ -302,7 +305,7 @@ async def select_buyers_salesman(db):
     return await crud_transform_json(result=result)
 
 
-async def select_real_estate_objects_min_max_cost(db):
+async def select_all_clients_and_agents(db):
     query = text("""
         SELECT peoples.*
         FROM peoples AS peoples

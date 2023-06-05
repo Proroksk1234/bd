@@ -10,7 +10,8 @@ from bd_my.bd_my.crud import crud_get_types_of_insurance, crud_get_objects_of_in
     crud_update_insurance_activity, crud_update_payments_under_the_contract, crud_delete_object_types, \
     crud_delete_types_of_insurance, crud_delete_objects_of_insurance, crud_delete_people_types, crud_delete_peoples, \
     crud_delete_insurance_activity, crud_delete_payments_under_the_contract, crud_get_all_types_columns, \
-    crud_add_columns, crud_delete_columns
+    crud_add_columns, crud_delete_columns, select_received_for_clients, select_all_peoples_life, select_objects_sum, \
+    select_dynamic_imprisonment, select_all_clients_and_agents
 from bd_my.db.connect_db import get_db
 
 bd = APIRouter()
@@ -216,27 +217,26 @@ async def delete_columns(table_name: str = Body(...), column_name: str = Body(..
     await crud_delete_columns(table_name=table_name, column_name=column_name, db=db)
 
 
-# @bd.get("/all_object_sales")
-# async def all_object_sales(db: AsyncSession = Depends(get_db)):
-#     return await select_all_object_sales(db=db)
-#
-#
-# @bd.get("/saldo")
-# async def saldo(db: AsyncSession = Depends(get_db)):
-#     return await select_saldo(db=db)
-#
-#
-# @bd.get("/dynamic_ceil")
-# async def dynamic_ceil(db: AsyncSession = Depends(get_db)):
-#     return await select_dynamic_ceil(db=db)
-#
-#
-# @bd.get("/buyers_salesman")
-# async def buyers_salesman(db: AsyncSession = Depends(get_db)):
-#     return await select_buyers_salesman(db=db)
-#
-#
-# @bd.get("/real_estate_objects_min_max_cost")
-# async def real_estate_objects_min_max_cost(db: AsyncSession = Depends(get_db), min_cost: float = Body(...),
-#                                            max_cost: float = Body(...)):
-#     return await select_real_estate_objects_min_max_cost(db=db, min_cost=min_cost, max_cost=max_cost)
+@bd.get("/all_peoples_life")
+async def all_peoples_life(db: AsyncSession = Depends(get_db)):
+    return await select_all_peoples_life(db=db, life_insurance_id=1)
+
+
+@bd.get("/received_for_clients")
+async def received_for_clients(db: AsyncSession = Depends(get_db)):
+    return await select_received_for_clients(db=db)
+
+
+@bd.get("/objects_sum")
+async def objects_sum(insurance_sum: int, db: AsyncSession = Depends(get_db)):
+    return await select_objects_sum(db=db, insurance_sum=insurance_sum)
+
+
+@bd.get("/dynamic_imprisonment")
+async def dynamic_imprisonment(db: AsyncSession = Depends(get_db)):
+    return await select_dynamic_imprisonment(db=db)
+
+
+@bd.get("/all_clients_and_agents")
+async def all_clients_and_agents(db: AsyncSession = Depends(get_db)):
+    return await select_all_clients_and_agents(db=db)
