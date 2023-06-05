@@ -1,15 +1,14 @@
 import os
 
+import asyncio as asyncio
 import uvicorn
-
-if __name__ == '__main__':
-    uvicorn.run("main:app", port=8000, host='127.0.0.1', log_level="debug")
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from bd_max.bd_max.bd_max import bd
 from bd_max.configurate.config import PROJECT_NAME, VERSION, ORIGINS, ALLOWED_CREDENTIALS, ALLOWED_METHODS, \
     ALLOWED_HEADERS, OPENAPI_URL
+from bd_my.db.connect_db import async_engine, Base
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -28,12 +27,15 @@ def get_application() -> FastAPI:
 
 app = get_application()
 
-# @app.on_event("startup")
-# async def startup():
-#     async with async_engine.begin() as conn:
-#         await conn.run_sync(Base.metadata.drop_all)
-#         await conn.run_sync(Base.metadata.create_all)
-#
-#
-# loop = asyncio.get_event_loop()
-# loop.run_until_complete(startup())
+
+@app.on_event("startup")
+async def startup():
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+
+
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(startup())
+    uvicorn.run("main:app", port=7998, host='127.0.0.1', log_level="debug")

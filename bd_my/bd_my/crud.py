@@ -170,8 +170,9 @@ async def crud_update_deal_types(data: dict, id_obj, db):
 
 async def crud_update_insurance_activity(data: dict, id_obj, db):
     for key, value in data.items():
-        if isinstance(value, datetime):
-            data[key] = value.isoformat()
+        print(value)
+        if key == 'date':
+            data[key] = datetime.strptime(value, '%Y-%m-%d').date()
     set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
     query_text = f"UPDATE insurance_activity SET {set_clause} WHERE id=:id_obj"
     query = text(query_text).bindparams(id_obj=id_obj, **data)

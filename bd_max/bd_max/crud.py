@@ -196,8 +196,13 @@ async def crud_update_peoples(data: dict, id_obj, db):
 
 
 async def crud_update_deals(data: dict, id_obj, db):
+    for key, value in data.items():
+        if key =='date':
+            data[key] = datetime.strptime(value, '%Y-%m-%d').date()
     set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
     query_text = f"UPDATE deals SET {set_clause} WHERE id=:id_obj"
+    print(data)
+    print(set_clause)
     query = text(query_text).bindparams(id_obj=id_obj, **data)
     await db.execute(query)
     await db.commit()
@@ -276,39 +281,39 @@ async def select_all_object_sales(db):
 
 async def select_saldo(db):
     query = text("""
-SELECT object_types.object_type, SUM(real_estate_objects.cost)
-FROM real_estate_objects
-JOIN object_types ON object_types.id = real_estate_objects.obj_type_id
-GROUP BY object_types.object_type
-""")
+    SELECT object_types.object_type, SUM(real_estate_objects.cost)
+    FROM real_estate_objects
+    JOIN object_types ON object_types.id = real_estate_objects.obj_type_id
+    GROUP BY object_types.object_type
+    """)
     result = await db.execute(query)
     return await crud_transform_json(result=result)
 
 
 async def select_dynamic_ceil(db):
     query = text("""
-SELECT districts.district, EXTRACT(YEAR FROM deals.date) AS year, COUNT(*)
-FROM deals
-JOIN real_estate_objects ON real_estate_objects.id = deals.real_estate_object_id
-JOIN districts ON districts.id = real_estate_objects.district_id
-GROUP BY districts.district, year
-""")
+        SELECT districts.district, EXTRACT(YEAR FROM deals.date) AS year, COUNT(*)
+        FROM deals
+        JOIN real_estate_objects ON real_estate_objects.id = deals.real_estate_object_id
+        JOIN districts ON districts.id = real_estate_objects.district_id
+        GROUP BY districts.district, year
+        """)
     result = await db.execute(query)
     return await crud_transform_json(result=result)
 
 
 async def select_buyers_salesman(db):
     query = text("""
-SELECT peoples.id, peoples.name, peoples.surname, peoples.patronymic, 
-    buyers.count AS buys_count, sellers.count AS sells_count
-FROM peoples
-LEFT JOIN (
-    SELECT buyer_id, COUNT(*) AS count FROM deals GROUP BY buyer_id
-) buyers ON buyers.buyer_id = peoples.id
-LEFT JOIN (
-    SELECT salesman_id, COUNT(*) AS count FROM deals GROUP BY salesman_id
-) sellers ON sellers.salesman_id = peoples.id
-""")
+        SELECT peoples.id, peoples.name, peoples.surname, peoples.patronymic, 
+            buyers.count AS buys_count, sellers.count AS sells_count
+        FROM peoples
+        LEFT JOIN (
+            SELECT buyer_id, COUNT(*) AS count FROM deals GROUP BY buyer_id
+        ) buyers ON buyers.buyer_id = peoples.id
+        LEFT JOIN (
+            SELECT salesman_id, COUNT(*) AS count FROM deals GROUP BY salesman_id
+        ) sellers ON sellers.salesman_id = peoples.id
+        """)
     result = await db.execute(query)
     return await crud_transform_json(result=result)
 
