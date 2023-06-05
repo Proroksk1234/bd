@@ -82,6 +82,8 @@ async def crud_transform_json(result):
         row_dict = dict(zip(columns, row))
         if 'date' in row_dict:
             row_dict['date'] = row_dict['date'].isoformat()
+        elif 'year' in row_dict:
+            row_dict['year'] = int(row_dict['year'])
         rows_dict.append(row_dict)
     return json.loads(json.dumps(rows_dict))
 
@@ -276,7 +278,7 @@ async def crud_delete_columns(table_name, column_name, db):
 async def select_all_object_sales(db):
     query = text("SELECT * FROM real_estate_objects WHERE sold = False")
     result = await db.execute(query)
-    return await crud_transform_json(result=result)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def select_saldo(db):
@@ -287,7 +289,7 @@ async def select_saldo(db):
     GROUP BY object_types.object_type
     """)
     result = await db.execute(query)
-    return await crud_transform_json(result=result)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def select_dynamic_ceil(db):
@@ -299,7 +301,8 @@ async def select_dynamic_ceil(db):
         GROUP BY districts.district, year
         """)
     result = await db.execute(query)
-    return await crud_transform_json(result=result)
+    print(result)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def select_buyers_salesman(db):
@@ -315,13 +318,13 @@ async def select_buyers_salesman(db):
         ) sellers ON sellers.salesman_id = peoples.id
         """)
     result = await db.execute(query)
-    return await crud_transform_json(result=result)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def select_real_estate_objects_min_max_cost(db, min_cost, max_cost):
-    query = f"SELECT * FROM real_estate_objects WHERE cost BETWEEN {min_cost} AND {max_cost}"
+    query = text(f"SELECT * FROM real_estate_objects WHERE cost BETWEEN {min_cost} AND {max_cost}")
     result = await db.execute(query)
-    return await crud_transform_json(result=result)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def data_check(db, result):

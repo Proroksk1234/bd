@@ -248,6 +248,5 @@ async def buyers_salesman(db: AsyncSession = Depends(get_db)):
 
 
 @bd.get("/real_estate_objects_min_max_cost")
-async def real_estate_objects_min_max_cost(db: AsyncSession = Depends(get_db), min_cost: float = Body(...),
-                                           max_cost: float = Body(...)):
+async def real_estate_objects_min_max_cost(min_cost: float, max_cost: float, db: AsyncSession = Depends(get_db)):
     return await select_real_estate_objects_min_max_cost(db=db, min_cost=min_cost, max_cost=max_cost)
