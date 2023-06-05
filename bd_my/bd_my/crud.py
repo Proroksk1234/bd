@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import text
 
@@ -252,53 +252,63 @@ async def crud_delete_columns(table_name, column_name, db):
     await db.commit()
 
 
-async def select_all_object_sales(db):
-    query = text("SELECT * FROM real_estate_objects WHERE sold = False")
+async def select_all_peoples_life(db, life_insurance_id):
+    one_month_ago = datetime.now() - timedelta(days=30)
+    query = text("""
+        SELECT peoples.*
+        FROM peoples AS peoples
+        JOIN insurance_activity AS insurance_activity ON peoples.id = insurance_activity.client_id
+        WHERE insurance_activity.date >= :one_month_ago
+        AND insurance_activity.objects_of_insurance_id = :life_insurance_id
+    """)
+    result = await db.execute(query, {"one_month_ago": one_month_ago, "life_insurance_id": life_insurance_id})
+    return await crud_transform_json(result=result)
+
+
+async def select_(db):
+    query = text("""
+        SELECT peoples.id, peoples.name, peoples.surname, SUM(payments_under_the_contract.payments) AS total_payments,
+        SUM(payments_under_the_contract.received) AS total_received
+        FROM peoples AS peoples
+        JOIN insurance_activity AS ia ON peoples.id = insurance_activity.client_id
+        JOIN payments_under_the_contract AS puc ON
+        insurance_activity.id = payments_under_the_contract.insurance_activity_id
+        GROUP BY peoples.id
+        """)
     result = await db.execute(query)
     return await crud_transform_json(result=result)
 
 
-async def select_saldo(db):
+async def select_dynamic_ceil(db, insurance_sum):
     query = text("""
-SELECT object_types.object_type, SUM(real_estate_objects.cost)
-FROM real_estate_objects
-JOIN object_types ON object_types.id = real_estate_objects.obj_type_id
-GROUP BY object_types.object_type
-""")
-    result = await db.execute(query)
-    return await crud_transform_json(result=result)
-
-
-async def select_dynamic_ceil(db):
-    query = text("""
-SELECT districts.district, EXTRACT(YEAR FROM deals.date) AS year, COUNT(*)
-FROM deals
-JOIN real_estate_objects ON real_estate_objects.id = deals.real_estate_object_id
-JOIN districts ON districts.id = real_estate_objects.district_id
-GROUP BY districts.district, year
-""")
-    result = await db.execute(query)
+        SELECT objects_of_insurance.*
+        FROM objects_of_insurance AS objects_of_insurance
+        WHERE objects_of_insurance.cost_object = :insurance_sum
+        """)
+    result = await db.execute(query, {"insurance_sum": insurance_sum})
     return await crud_transform_json(result=result)
 
 
 async def select_buyers_salesman(db):
     query = text("""
-SELECT peoples.id, peoples.name, peoples.surname, peoples.patronymic, 
-    buyers.count AS buys_count, sellers.count AS sells_count
-FROM peoples
-LEFT JOIN (
-    SELECT buyer_id, COUNT(*) AS count FROM deals GROUP BY buyer_id
-) buyers ON buyers.buyer_id = peoples.id
-LEFT JOIN (
-    SELECT salesman_id, COUNT(*) AS count FROM deals GROUP BY salesman_id
-) sellers ON sellers.salesman_id = peoples.id
-""")
+        SELECT types_of_insurance.type_of_insurance, COUNT(insurance_activity.id) AS contracts_count, EXTRACT(YEAR_MONTH FROM insurance_activity.date) AS year_month
+        FROM insurance_activity AS insurance_activity
+        JOIN objects_of_insurance AS objects_of_insurance ON insurance_activity.objects_of_insurance_id = objects_of_insurance.id
+        JOIN types_of_insurance AS types_of_insurance ON objects_of_insurance.type_of_insurance_id = types_of_insurance.id
+        GROUP BY types_of_insurance.type_of_insurance, year_month
+        ORDER BY year_month, types_of_insurance.type_of_insurance
+        """)
     result = await db.execute(query)
     return await crud_transform_json(result=result)
 
 
-async def select_real_estate_objects_min_max_cost(db, min_cost, max_cost):
-    query = f"SELECT * FROM real_estate_objects WHERE cost BETWEEN {min_cost} AND {max_cost}"
+async def select_real_estate_objects_min_max_cost(db):
+    query = text("""
+        SELECT peoples.*
+        FROM peoples AS peoples
+        JOIN types_people AS types_people ON peoples.type_people_id = types_people.id
+        WHERE types_people.type_people IN ('client', 'agent')
+        """)
     result = await db.execute(query)
     return await crud_transform_json(result=result)
 
