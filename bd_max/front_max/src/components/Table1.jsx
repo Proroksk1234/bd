@@ -40,13 +40,14 @@ export const Table1 = () => {
   const updateObj = (id, updatedElement) => {
     const district_id = updatedElement.district_id[0].id;
     const obj_type_id = updatedElement.obj_type_id[0].id;
-    const { cost, square, sold } = updatedElement;
+    const { cost, square, sold, address } = updatedElement;
     const data = {
       cost: Number(cost),
       square: Number(square),
       sold: !!sold,
       district_id,
       obj_type_id,
+      address,
     };
     console.log(data);
     axios

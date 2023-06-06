@@ -72,7 +72,7 @@ export const Table3 = () => {
     const isEditing = editingIds.includes(element.id);
 
     return (
-      <tr key={element.name} id={`row-${element.id}`}>
+      <tr key={element.id} id={`row-${element.id}`}>
         <td>
           {isEditing ? (
             <Button color="green" onClick={() => cancelEditing(element.id)}>
