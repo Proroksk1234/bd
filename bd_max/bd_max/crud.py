@@ -116,7 +116,7 @@ async def crud_post_real_estate_objects(data: dict, db):
 async def crud_post_deal_types(data: dict, db):
     fields = ','.join(data.keys())
     placeholders = ','.join(f':{key}' for key in data.keys())
-    query_text = f"INSERT INTO deal_types ({fields}) VALUES ({placeholders})"
+    query_text = text(f"INSERT INTO deal_types ({fields}) VALUES ({placeholders})")
     await db.execute(query_text, data)
     await db.commit()
 
@@ -124,7 +124,7 @@ async def crud_post_deal_types(data: dict, db):
 async def crud_post_people_types(data: dict, db):
     fields = ','.join(data.keys())
     placeholders = ','.join(f':{key}' for key in data.keys())
-    query_text = f"INSERT INTO people_types ({fields}) VALUES ({placeholders})"
+    query_text = text(f"INSERT INTO people_types ({fields}) VALUES ({placeholders})")
     await db.execute(query_text, data)
     await db.commit()
 
@@ -132,7 +132,7 @@ async def crud_post_people_types(data: dict, db):
 async def crud_post_peoples(data: dict, db):
     fields = ','.join(data.keys())
     placeholders = ','.join(f':{key}' for key in data.keys())
-    query_text = f"INSERT INTO peoples ({fields}) VALUES ({placeholders})"
+    query_text = text(f"INSERT INTO peoples ({fields}) VALUES ({placeholders})")
     await db.execute(query_text, data)
     await db.commit()
 
@@ -144,7 +144,7 @@ async def crud_post_deals(data: dict, db):
 
     fields = ','.join(data.keys())
     placeholders = ','.join(f':{key}' for key in data.keys())
-    query_text = f"INSERT INTO deals ({fields}) VALUES ({placeholders})"
+    query_text = text(f"INSERT INTO deals ({fields}) VALUES ({placeholders})")
     await db.execute(query_text, data)
     await db.commit()
 
