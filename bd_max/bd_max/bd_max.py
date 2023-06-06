@@ -143,37 +143,44 @@ async def post_deals(data: dict = Body(...), db: AsyncSession = Depends(get_db))
 
 @bd.put('/update_object_types/{id_obj}')
 async def update_object_types(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_object_types(id_obj=id_obj, data=data, db=db)
+    for _ in data:
+        await crud_update_object_types(id_obj=id_obj, data=_, db=db)
 
 
 @bd.put('/update_districts/{id_obj}')
 async def update_districts(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_districts(id_obj=id_obj, data=data, db=db)
+    for _ in data:
+        await crud_update_districts(id_obj=id_obj, data=_, db=db)
 
 
 @bd.put('/update_real_estate_objects/{id_obj}')
 async def update_real_estate_objects(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_real_estate_objects(id_obj=id_obj, data=data, db=db)
+    for _ in data:
+        await crud_update_real_estate_objects(id_obj=id_obj, data=data, db=db)
 
 
 @bd.put('/update_deal_types/{id_obj}')
 async def update_deal_types(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_deal_types(id_obj=id_obj, data=data, db=db)
+    for _ in data:
+        await crud_update_deal_types(id_obj=id_obj, data=data, db=db)
 
 
 @bd.put('/update_people_types/{id_obj}')
 async def update_people_types(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_people_types(id_obj=id_obj, data=data, db=db)
+    for _ in data:
+        await crud_update_people_types(id_obj=id_obj, data=data, db=db)
 
 
 @bd.put('/update_peoples/{id_obj}')
 async def update_peoples(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_peoples(id_obj=id_obj, data=data, db=db)
+    for _ in data:
+        await crud_update_peoples(id_obj=id_obj, data=data, db=db)
 
 
 @bd.put('/update_deals/{id_obj}')
 async def update_deals(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_deals(id_obj=id_obj, data=data, db=db)
+    for _ in data:
+        await crud_update_deals(id_obj=id_obj, data=data, db=db)
 
 
 @bd.delete('/delete_object_types/{id_obj}')
