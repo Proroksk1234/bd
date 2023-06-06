@@ -1,0 +1,156 @@
+.layout {
+  min-height: 100vh;
+  background-color: #77aad1;
+}
+.home-bg {
+  background-image: url("./assets/home-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  margin: 0 30px;
+  height: 40vh;
+}
+.body {
+  display: flex;
+  gap: 40%;
+  justify-content: center;
+}
+.home-left {
+  padding-top: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.home-left p {
+  font-size: 28px;
+}
+.home-right {
+  padding-top: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 30%;
+}
+.home-link {
+  background-color: blue;
+  font-size: 20px;
+  color: wheat;
+  border-radius: 15px;
+  padding: 10px 0;
+  width: 300px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.home-link:hover {
+  background-color: white;
+  color: blue;
+}
+.arrow {
+  position: fixed;
+  top: 40px;
+  left: 40px;
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+}
+.save-changes {
+  margin-top: 40px;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gap {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+.tables {
+  padding-bottom: 50px;
+}
+.forms {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30%;
+  min-height: 100vh;
+}
+.forms-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.forms-right {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+.form-body {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  gap: 20px;
+  padding: 20px;
+  background-color: rgb(51, 126, 161);
+  border: 2px solid wheat;
+  border-radius: 20px;
+}
+.form-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.input {
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 16px;
+}
+.form-button {
+  background-color: blue;
+  color: wheat;
+  border-radius: 10px;
+  height: 30px;
+}
+.report-link {
+  background-color: blue;
+  font-size: 20px;
+  color: wheat;
+  border-radius: 15px;
+  padding: 10px 0;
+  width: 450px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.report-link:hover {
+  background-color: white;
+  color: blue;
+}
+.reports-left {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+.reports-right {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+.req-flex {
+  display: flex;
+  justify-content: center;
+}
+.req {
+  padding-top: 80px;
+}
