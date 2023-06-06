@@ -143,12 +143,12 @@ async def post_deals(data: dict = Body(...), db: AsyncSession = Depends(get_db))
 
 @bd.put('/update_object_types/{id_obj}')
 async def update_object_types(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_object_types(id_obj=id_obj, data=_, db=db)
+    await crud_update_object_types(id_obj=id_obj, data=data, db=db)
 
 
 @bd.put('/update_districts/{id_obj}')
 async def update_districts(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_districts(id_obj=id_obj, data=_, db=db)
+    await crud_update_districts(id_obj=id_obj, data=data, db=db)
 
 
 @bd.put('/update_real_estate_objects/{id_obj}')
