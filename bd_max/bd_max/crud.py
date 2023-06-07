@@ -6,70 +6,70 @@ from sqlalchemy import text
 
 async def crud_get_types_obj(db, id_obj=None):
     if id_obj:
-        query = text("SELECT * FROM object_types WHERE id = :id_obj")
+        query = text("SELECT * FROM object_types WHERE id = :id_obj ORDER BY id")
         result = await db.execute(query, {"id_obj": id_obj})
     else:
-        query = text("SELECT * From object_types")
+        query = text("SELECT * From object_types ORDER BY id")
         result = await db.execute(query)
     return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def crud_get_deal_types(db, id_obj=None):
     if id_obj:
-        query = text("SELECT * FROM deal_types WHERE id = :id_obj")
+        query = text("SELECT * FROM deal_types WHERE id = :id_obj ORDER BY id")
         result = await db.execute(query, {"id_obj": id_obj})
     else:
-        query = text("SELECT * From deal_types")
+        query = text("SELECT * From deal_types ORDER BY id")
         result = await db.execute(query)
     return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def crud_get_districts(db, id_obj=None):
     if id_obj:
-        query = text("SELECT * FROM districts WHERE id = :id_obj")
+        query = text("SELECT * FROM districts WHERE id = :id_obj ORDER BY id")
         result = await db.execute(query, {"id_obj": id_obj})
     else:
-        query = text("SELECT * From districts")
+        query = text("SELECT * From districts ORDER BY id")
         result = await db.execute(query)
     return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def crud_get_people_types(db, id_obj=None):
     if id_obj:
-        query = text("SELECT * FROM people_types WHERE id = :id_obj")
+        query = text("SELECT * FROM people_types WHERE id = :id_obj ORDER BY id")
         result = await db.execute(query, {"id_obj": id_obj})
     else:
-        query = text("SELECT * From people_types")
+        query = text("SELECT * From people_types ORDER BY id")
         result = await db.execute(query)
     return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def crud_get_real_estate_objects(db, id_obj=None):
     if id_obj:
-        query = text("SELECT * FROM real_estate_objects WHERE id = :id_obj")
+        query = text("SELECT * FROM real_estate_objects WHERE id = :id_obj ORDER BY id")
         result = await db.execute(query, {"id_obj": id_obj})
     else:
-        query = text("SELECT * From real_estate_objects")
+        query = text("SELECT * From real_estate_objects ORDER BY id")
         result = await db.execute(query)
     return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def crud_get_peoples(db, people_type_id, id_obj=None):
     if id_obj:
-        query = text("SELECT * FROM peoples WHERE id = :id_obj and people_type_id = :people_type_id")
+        query = text("SELECT * FROM peoples WHERE id = :id_obj and people_type_id = :people_type_id ORDER BY id")
         result = await db.execute(query, {"id_obj": id_obj, "people_type_id": people_type_id})
     else:
-        query = text("SELECT * From peoples WHERE people_type_id = :people_type_id")
+        query = text("SELECT * From peoples WHERE people_type_id = :people_type_id ORDER BY id")
         result = await db.execute(query, {"people_type_id": people_type_id})
     return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def crud_get_deals(db, id_obj=None):
     if id_obj:
-        query = text("SELECT * FROM deals WHERE id = :id_obj")
+        query = text("SELECT * FROM deals WHERE id = :id_obj ORDER BY id")
         result = await db.execute(query, {"id_obj": id_obj})
     else:
-        query = text("SELECT * From deals")
+        query = text("SELECT * From deals ORDER BY id")
         result = await db.execute(query)
     return await data_check(result=await crud_transform_json(result=result), db=db)
 
@@ -278,7 +278,7 @@ async def crud_delete_columns(table_name, column_name, db):
 
 
 async def select_all_object_sales(db):
-    query = text("SELECT * FROM real_estate_objects WHERE sold = False")
+    query = text("SELECT * FROM real_estate_objects WHERE sold = False ORDER BY id")
     result = await db.execute(query)
     return await data_check(result=await crud_transform_json(result=result), db=db)
 
@@ -288,7 +288,7 @@ async def select_saldo(db):
     SELECT object_types.object_type, SUM(real_estate_objects.cost)
     FROM real_estate_objects
     JOIN object_types ON object_types.id = real_estate_objects.obj_type_id
-    GROUP BY object_types.object_type
+    GROUP BY object_types.object_type ORDER BY id
     """)
     result = await db.execute(query)
     return await data_check(result=await crud_transform_json(result=result), db=db)
@@ -300,7 +300,7 @@ async def select_dynamic_ceil(db):
         FROM deals
         JOIN real_estate_objects ON real_estate_objects.id = deals.real_estate_object_id
         JOIN districts ON districts.id = real_estate_objects.district_id
-        GROUP BY districts.district, year
+        GROUP BY districts.district, year ORDER BY id
         """)
     result = await db.execute(query)
     print(result)
@@ -317,14 +317,14 @@ async def select_buyers_salesman(db):
         ) buyers ON buyers.buyer_id = peoples.id
         LEFT JOIN (
             SELECT salesman_id, COUNT(*) AS count FROM deals GROUP BY salesman_id
-        ) sellers ON sellers.salesman_id = peoples.id
+        ) sellers ON sellers.salesman_id = peoples.id ORDER BY id
         """)
     result = await db.execute(query)
     return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
 async def select_real_estate_objects_min_max_cost(db, min_cost, max_cost):
-    query = text(f"SELECT * FROM real_estate_objects WHERE cost BETWEEN {min_cost} AND {max_cost}")
+    query = text(f"SELECT * FROM real_estate_objects WHERE cost BETWEEN {min_cost} AND {max_cost} ORDER BY id")
     result = await db.execute(query)
     return await data_check(result=await crud_transform_json(result=result), db=db)
 
