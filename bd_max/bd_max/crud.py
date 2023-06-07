@@ -146,11 +146,7 @@ async def crud_post_deals(data: dict, db):
     query_text = text(f"INSERT INTO deals ({fields}) VALUES ({placeholders})")
     await db.execute(query_text, data)
     await db.commit()
-    fields = ','.join(data.keys())
-    placeholders = ','.join(f':{key}' for key in data.keys())
-    query_text = text(f"INSERT INTO deals ({fields}) VALUES ({placeholders})")
-    await db.execute(query_text, data)
-    await db.commit()
+    
 
 
 async def crud_update_object_types(data: dict, id_obj, db):
