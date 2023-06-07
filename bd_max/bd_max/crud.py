@@ -138,7 +138,6 @@ async def crud_post_peoples(data: dict, db):
 
 
 async def crud_post_deals(data: dict, db):
-    async def crud_post_deals(data: dict, db):
     for key, value in data.items():
         if key == 'date':
             data[key] = datetime.strptime(value, '%Y-%m-%d').date()
