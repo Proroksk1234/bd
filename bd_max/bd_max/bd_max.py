@@ -1,253 +1,350 @@
-from fastapi import APIRouter, Depends
-from fastapi.params import Body
-from sqlalchemy.ext.asyncio import AsyncSession
+import json
+from datetime import datetime
+
+from sqlalchemy import text
+
+
+async def crud_get_types_obj(db, id_obj=None):
+    if id_obj:
+        query = text("SELECT * FROM object_types WHERE id = :id_obj ORDER BY id")
+        result = await db.execute(query, {"id_obj": id_obj})
+    else:
+        query = text("SELECT * From object_types ORDER BY id")
+        result = await db.execute(query)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
+
+
+async def crud_get_deal_types(db, id_obj=None):
+    if id_obj:
+        query = text("SELECT * FROM deal_types WHERE id = :id_obj ORDER BY id")
+        result = await db.execute(query, {"id_obj": id_obj})
+    else:
+        query = text("SELECT * From deal_types ORDER BY id")
+        result = await db.execute(query)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
+
+
+async def crud_get_districts(db, id_obj=None):
+    if id_obj:
+        query = text("SELECT * FROM districts WHERE id = :id_obj ORDER BY id")
+        result = await db.execute(query, {"id_obj": id_obj})
+    else:
+        query = text("SELECT * From districts ORDER BY id")
+        result = await db.execute(query)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
+
+
+async def crud_get_people_types(db, id_obj=None):
+    if id_obj:
+        query = text("SELECT * FROM people_types WHERE id = :id_obj ORDER BY id")
+        result = await db.execute(query, {"id_obj": id_obj})
+    else:
+        query = text("SELECT * From people_types ORDER BY id")
+        result = await db.execute(query)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
+
+
+async def crud_get_real_estate_objects(db, id_obj=None):
+    if id_obj:
+        query = text("SELECT * FROM real_estate_objects WHERE id = :id_obj ORDER BY id")
+        result = await db.execute(query, {"id_obj": id_obj})
+    else:
+        query = text("SELECT * From real_estate_objects ORDER BY id")
+        result = await db.execute(query)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
+
+
+async def crud_get_peoples(db, people_type_id, id_obj=None):
+    if id_obj:
+        query = text("SELECT * FROM peoples WHERE id = :id_obj and people_type_id = :people_type_id ORDER BY id")
+        result = await db.execute(query, {"id_obj": id_obj, "people_type_id": people_type_id})
+    else:
+        query = text("SELECT * From peoples WHERE people_type_id = :people_type_id ORDER BY id")
+        result = await db.execute(query, {"people_type_id": people_type_id})
+    return await data_check(result=await crud_transform_json(result=result), db=db)
+
+
+async def crud_get_deals(db, id_obj=None):
+    if id_obj:
+        query = text("SELECT * FROM deals WHERE id = :id_obj ORDER BY id")
+        result = await db.execute(query, {"id_obj": id_obj})
+    else:
+        query = text("SELECT * From deals ORDER BY id")
+        result = await db.execute(query)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
+
+
+async def crud_transform_json(result):
+    rows = result.fetchall()
+    columns = result.keys()
+    rows_dict = []
+    for row in rows:
+        row_dict = dict(zip(columns, row))
+        if 'date' in row_dict:
+            row_dict['date'] = row_dict['date'].isoformat()
+        elif 'year' in row_dict:
+            row_dict['year'] = int(row_dict['year'])
+        rows_dict.append(row_dict)
+    return json.loads(json.dumps(rows_dict))
+
+
+async def crud_post_object_types(data: dict, db):
+    fields = ','.join(data.keys())
+    placeholders = ','.join(f':{key}' for key in data.keys())
+    query_text = f"insert into object_types ({fields}) values ({placeholders})"
+    query_text = text(query_text)
+    await db.execute(query_text, data)
+    await db.commit()
+
+
+async def crud_post_districts(data: dict, db):
+    fields = ','.join(data.keys())
+    placeholders = ','.join(f':{key}' for key in data.keys())
+    query_text = text(f"INSERT INTO districts ({fields}) VALUES ({placeholders})")
+    await db.execute(query_text, data)
+    await db.commit()
+
+
+async def crud_post_real_estate_objects(data: dict, db):
+    fields = ','.join(data.keys())
+    placeholders = ','.join(f':{key}' for key in data.keys())
+    query_text = text(f"INSERT INTO real_estate_objects ({fields}) VALUES ({placeholders})")
+    await db.execute(query_text, data)
+    await db.commit()
+
+
+async def crud_post_deal_types(data: dict, db):
+    fields = ','.join(data.keys())
+    placeholders = ','.join(f':{key}' for key in data.keys())
+    query_text = text(f"INSERT INTO deal_types ({fields}) VALUES ({placeholders})")
+    await db.execute(query_text, data)
+    await db.commit()
+
+
+async def crud_post_people_types(data: dict, db):
+    fields = ','.join(data.keys())
+    placeholders = ','.join(f':{key}' for key in data.keys())
+    query_text = text(f"INSERT INTO people_types ({fields}) VALUES ({placeholders})")
+    await db.execute(query_text, data)
+    await db.commit()
+
+
+async def crud_post_peoples(data: dict, db):
+    fields = ','.join(data.keys())
+    placeholders = ','.join(f':{key}' for key in data.keys())
+    query_text = text(f"INSERT INTO peoples ({fields}) VALUES ({placeholders})")
+    await db.execute(query_text, data)
+    await db.commit()
+
+
+async def crud_post_deals(data: dict, db):
+    for key, value in data.items():
+        if isinstance(value, datetime):
+            data[key] = value.isoformat()
+
+    fields = ','.join(data.keys())
+    placeholders = ','.join(f':{key}' for key in data.keys())
+    query_text = text(f"INSERT INTO deals ({fields}) VALUES ({placeholders})")
+    await db.execute(query_text, data)
+    await db.commit()
+
+
+async def crud_update_object_types(data: dict, id_obj, db):
+    set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
+    query_text = f"UPDATE object_types SET {set_clause} WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj, **data)
+    await db.execute(query)
+    await db.commit()
+
+
+async def crud_update_districts(data: dict, id_obj, db):
+    set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
+    query_text = f"UPDATE districts SET {set_clause} WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj, **data)
+    await db.execute(query)
+    await db.commit()
 
-from bd_max.db.connect_db import get_db
-from .crud import crud_get_types_obj, crud_get_deal_types, crud_get_districts, crud_get_people_types, \
-    crud_get_real_estate_objects, crud_get_peoples, crud_get_deals, crud_post_object_types, crud_post_districts, \
-    crud_post_real_estate_objects, crud_post_deal_types, crud_post_people_types, crud_post_peoples, crud_post_deals, \
-    crud_update_object_types, crud_update_real_estate_objects, crud_update_districts, crud_update_deal_types, \
-    crud_update_people_types, crud_update_peoples, crud_update_deals, crud_delete_object_types, crud_delete_districts, \
-    crud_delete_real_estate_objects, crud_delete_deal_types, crud_delete_people_types, crud_delete_peoples, \
-    crud_delete_deals, crud_get_all_types_columns, crud_add_columns, crud_delete_columns, select_all_object_sales, \
-    select_real_estate_objects_min_max_cost, select_buyers_salesman, select_dynamic_ceil, select_saldo
 
-bd = APIRouter()
+async def crud_update_real_estate_objects(data: dict, id_obj, db):
+    set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
+    query_text = f"UPDATE real_estate_objects SET {set_clause} WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj, **data)
+    await db.execute(query)
+    await db.commit()
 
 
-@bd.get('/get_all')
-async def get_all_tables(db: AsyncSession = Depends(get_db)):
-    all_types_obj = await crud_get_types_obj(db=db)
-    all_districts = await crud_get_districts(db=db)
-    all_real_estate_objects = await crud_get_real_estate_objects(db=db)
-    all_deal_types = await crud_get_deal_types(db=db)
-    all_people_types = await crud_get_people_types(db=db)
-    all_buyer = await crud_get_peoples(db=db, people_type_id=1)
-    all_sales = await crud_get_peoples(db=db, people_type_id=2)
-    all_deals = await crud_get_deals(db=db)
-    return {'type_obj': all_types_obj, 'deal_types': all_deal_types, 'districts': all_districts,
-            'real_estate_objects': all_real_estate_objects, 'people_types': all_people_types,
-            'buyer': all_buyer, 'salesman': all_sales, 'deals': all_deals}
+async def crud_update_deal_types(data: dict, id_obj, db):
+    set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
+    query_text = f"UPDATE deal_types SET {set_clause} WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj, **data)
+    await db.execute(query)
+    await db.commit()
 
 
-@bd.get('/get_all_type_obj')
-async def get_all_types_obj(db: AsyncSession = Depends(get_db)):
-    return await crud_get_types_obj(db=db)
+async def crud_update_people_types(data: dict, id_obj, db):
+    set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
+    query_text = f"UPDATE people_types SET {set_clause} WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj, **data)
+    await db.execute(query)
+    await db.commit()
 
 
-#
-@bd.get('/get_type_obj/{id_obj}')
-async def get_type_obj(id_obj: int, db: AsyncSession = Depends(get_db)):
-    return await crud_get_types_obj(db=db, id_obj=id_obj)
+async def crud_update_peoples(data: dict, id_obj, db):
+    set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
+    query_text = f"UPDATE peoples SET {set_clause} WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj, **data)
+    await db.execute(query)
+    await db.commit()
 
 
-@bd.get('/get_all_deal_types')
-async def get_all_deal_types(db: AsyncSession = Depends(get_db)):
-    return await crud_get_deal_types(db=db)
+async def crud_update_deals(data: dict, id_obj, db):
+    for key, value in data.items():
+        if key =='date':
+            data[key] = datetime.strptime(value, '%Y-%m-%d').date()
+    set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
+    query_text = f"UPDATE deals SET {set_clause} WHERE id=:id_obj"
+    print(data)
+    print(set_clause)
+    query = text(query_text).bindparams(id_obj=id_obj, **data)
+    await db.execute(query)
+    await db.commit()
 
 
-@bd.get('/get_deal_types/{id_obj}')
-async def get_deal_types(id_obj: int, db: AsyncSession = Depends(get_db)):
-    return await crud_get_deal_types(db=db, id_obj=id_obj)
-
-
-@bd.get('/get_all_districts')
-async def get_all_districts(db: AsyncSession = Depends(get_db)):
-    return await crud_get_districts(db=db)
-
-
-@bd.get('/get_districts/{id_obj}')
-async def get_districts(id_obj: int, db: AsyncSession = Depends(get_db)):
-    return await crud_get_districts(db=db, id_obj=id_obj)
-
-
-@bd.get('/get_all_people_types')
-async def get_districts(db: AsyncSession = Depends(get_db)):
-    return await crud_get_people_types(db=db)
-
-
-@bd.get('/get_all_real_estate_objects')
-async def get_all_real_estate_objects(db: AsyncSession = Depends(get_db)):
-    return await crud_get_real_estate_objects(db=db)
-
-
-@bd.get('/get_real_estate_objects/{id_obj}')
-async def get_real_estate_objects(id_obj: int, db: AsyncSession = Depends(get_db)):
-    return await crud_get_real_estate_objects(db=db, id_obj=id_obj)
-
-
-@bd.get('/get_all_buyers')
-async def get_all_buyers(db: AsyncSession = Depends(get_db)):
-    return await crud_get_peoples(db=db, people_type_id=1)
-
-
-@bd.get('/get_buyers/{id_obj}')
-async def get_buyers(id_obj: int, db: AsyncSession = Depends(get_db)):
-    return await crud_get_peoples(db=db, people_type_id=1, id_obj=id_obj)
-
-
-@bd.get('/get_all_salesman')
-async def get_all_salesman(db: AsyncSession = Depends(get_db)):
-    return await crud_get_peoples(db=db, people_type_id=2)
-
-
-@bd.get('/get_salesman/{id_obj}')
-async def get_salesman(id_obj: int, db: AsyncSession = Depends(get_db)):
-    return await crud_get_peoples(db=db, people_type_id=2, id_obj=id_obj)
-
-
-@bd.get('/get_all_deals')
-async def get_all_deals(db: AsyncSession = Depends(get_db)):
-    return await crud_get_deals(db=db)
-
-
-@bd.get('/get_deals/{id_obj}')
-async def get_all_deals(id_obj: int, db: AsyncSession = Depends(get_db)):
-    return await crud_get_deals(db=db, id_obj=id_obj)
-
-
-@bd.post('/post_object_types')
-async def create_object_types(data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_post_object_types(data=data, db=db)
-
-
-@bd.post('/post_districts')
-async def post_districts(data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_post_districts(data=data, db=db)
-
-
-@bd.post('/post_real_estate_objects')
-async def post_real_estate_objects(data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_post_real_estate_objects(data=data, db=db)
-
-
-@bd.post('/post_deal_types')
-async def post_deal_types(data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_post_deal_types(data=data, db=db)
-
-
-@bd.post('/post_people_types')
-async def post_people_types(data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_post_people_types(data=data, db=db)
-
-
-@bd.post('/post_peoples')
-async def post_peoples(data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_post_peoples(data=data, db=db)
-
-
-@bd.post('/post_deals')
-async def post_deals(data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_post_deals(data=data, db=db)
-
-
-@bd.put('/update_object_types/{id_obj}')
-async def update_object_types(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_object_types(id_obj=id_obj, data=data, db=db)
-
-
-@bd.put('/update_districts/{id_obj}')
-async def update_districts(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_districts(id_obj=id_obj, data=data, db=db)
-
-
-@bd.put('/update_real_estate_objects/{id_obj}')
-async def update_real_estate_objects(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_real_estate_objects(id_obj=id_obj, data=data, db=db)
-
-
-@bd.put('/update_deal_types/{id_obj}')
-async def update_deal_types(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    for _ in data:
-        await crud_update_deal_types(id_obj=id_obj, data=data, db=db)
-
-
-@bd.put('/update_people_types/{id_obj}')
-async def update_people_types(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_people_types(id_obj=id_obj, data=data, db=db)
-
-
-@bd.put('/update_peoples/{id_obj}')
-async def update_peoples(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_peoples(id_obj=id_obj, data=data, db=db)
-
-
-@bd.put('/update_deals/{id_obj}')
-async def update_deals(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_deals(id_obj=id_obj, data=data, db=db)
-
-
-@bd.delete('/delete_object_types/{id_obj}')
-async def delete_object_types(id_obj: int, db: AsyncSession = Depends(get_db)):
-    await crud_delete_object_types(id_obj=id_obj, db=db)
-
-
-@bd.delete('/delete_districts/{id_obj}')
-async def delete_districts(id_obj: int, db: AsyncSession = Depends(get_db)):
-    await crud_delete_districts(id_obj=id_obj, db=db)
-
-
-@bd.delete('/delete_real_estate_objects/{id_obj}')
-async def delete_real_estate_objects(id_obj: int, db: AsyncSession = Depends(get_db)):
-    await crud_delete_real_estate_objects(id_obj=id_obj, db=db)
-
-
-@bd.delete('/delete_deal_types/{id_obj}')
-async def delete_deal_types(id_obj: int, db: AsyncSession = Depends(get_db)):
-    await crud_delete_deal_types(id_obj=id_obj, db=db)
-
-
-@bd.delete('/delete_people_types/{id_obj}')
-async def delete_people_types(id_obj: int, db: AsyncSession = Depends(get_db)):
-    await crud_delete_people_types(id_obj=id_obj, db=db)
-
-
-@bd.delete('/delete_peoples/{id_obj}')
-async def delete_peoples(id_obj: int, db: AsyncSession = Depends(get_db)):
-    await crud_delete_peoples(id_obj=id_obj, db=db)
-
-
-@bd.delete('/delete_deals/{id_obj}')
-async def delete_deals(id_obj: int, db: AsyncSession = Depends(get_db)):
-    await crud_delete_deals(id_obj=id_obj, db=db)
-
-
-@bd.get("/get_all_types_columns")
-async def get_all_types_columns():
-    return await crud_get_all_types_columns()
-
-
-@bd.post("/add_columns")
-async def add_columns(table_name: str = Body(...), column_name: str = Body(...), data_type: str = Body(...),
-                      db: AsyncSession = Depends(get_db)):
-    await crud_add_columns(table_name=table_name, column_name=column_name, data_type=data_type, db=db)
-
-
-@bd.post("/delete_columns")
-async def delete_columns(table_name: str = Body(...), column_name: str = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_delete_columns(table_name=table_name, column_name=column_name, db=db)
-
-
-@bd.get("/all_object_sales")
-async def all_object_sales(db: AsyncSession = Depends(get_db)):
-    return await select_all_object_sales(db=db)
-
-
-@bd.get("/saldo")
-async def saldo(db: AsyncSession = Depends(get_db)):
-    return await select_saldo(db=db)
-
-
-@bd.get("/dynamic_ceil")
-async def dynamic_ceil(db: AsyncSession = Depends(get_db)):
-    return await select_dynamic_ceil(db=db)
-
-
-@bd.get("/buyers_salesman")
-async def buyers_salesman(db: AsyncSession = Depends(get_db)):
-    return await select_buyers_salesman(db=db)
-
-
-@bd.get("/real_estate_objects_min_max_cost")
-async def real_estate_objects_min_max_cost(min_cost: float, max_cost: float, db: AsyncSession = Depends(get_db)):
-    return await select_real_estate_objects_min_max_cost(db=db, min_cost=min_cost, max_cost=max_cost)
+async def crud_delete_object_types(id_obj, db):
+    query_text = "DELETE FROM object_types WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj)
+    await db.execute(query)
+    await db.commit()
+
+
+async def crud_delete_districts(id_obj, db):
+    query_text = "DELETE FROM districts WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj)
+    await db.execute(query)
+    await db.commit()
+
+
+async def crud_delete_real_estate_objects(id_obj, db):
+    query_text = "DELETE FROM real_estate_objects WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj)
+    await db.execute(query)
+    await db.commit()
+
+
+async def crud_delete_deal_types(id_obj, db):
+    query_text = "DELETE FROM deal_types WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj)
+    await db.execute(query)
+    await db.commit()
+
+
+async def crud_delete_people_types(id_obj, db):
+    query_text = "DELETE FROM people_types WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj)
+    await db.execute(query)
+    await db.commit()
+
+
+async def crud_delete_peoples(id_obj, db):
+    query_text = "DELETE FROM peoples WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj)
+    await db.execute(query)
+    await db.commit()
+
+
+async def crud_delete_deals(id_obj, db):
+    query_text = "DELETE FROM deals WHERE id=:id_obj"
+    query = text(query_text).bindparams(id_obj=id_obj)
+    await db.execute(query)
+    await db.commit()
+
+
+async def crud_get_all_types_columns():
+    return ['integer', 'varchar', 'boolean', "float", "date", "timestamp"]
+
+
+async def crud_add_columns(table_name, column_name, data_type, db):
+    query = text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {data_type}")
+    await db.execute(query)
+    await db.commit()
+
+
+async def crud_delete_columns(table_name, column_name, db):
+    query = text(f"ALTER TABLE {table_name} DROP COLUMN {column_name}")
+    await db.execute(query)
+    await db.commit()
+
+
+async def select_all_object_sales(db):
+    query = text("SELECT * FROM real_estate_objects WHERE sold = False ORDER BY id")
+    result = await db.execute(query)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
+
+
+async def select_saldo(db):
+    query = text("""
+        SELECT object_types.object_type, COALESCE(SUM(real_estate_objects.cost), 0)
+        FROM object_types
+        LEFT JOIN real_estate_objects ON object_types.id = real_estate_objects.obj_type_id
+        GROUP BY object_types.object_type
+    """)
+    result = await db.execute(query)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
+
+
+async def select_dynamic_ceil(db):
+    query = text("""
+            SELECT EXTRACT(YEAR FROM deals.date) AS year, 
+                   districts.district,
+                   COUNT(*) AS sales_count
+            FROM deals
+            JOIN real_estate_objects ON real_estate_objects.id = deals.real_estate_object_id
+            JOIN districts ON districts.id = real_estate_objects.district_id
+            GROUP BY year, districts.district
+            ORDER BY year, districts.district
+        """)
+    result = await db.execute(query)
+    print(result)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
+
+
+async def select_buyers_salesman(db):
+    query = text("""
+            SELECT peoples.*
+            FROM peoples
+            JOIN people_types ON peoples.people_type_id = people_types.id
+            WHERE people_types.people_type IN ('Покупатель', 'Продавец')
+            ORDER BY peoples.people_type_id, peoples.id
+        """)
+    result = await db.execute(query)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
+
+
+async def select_real_estate_objects_min_max_cost(db, min_cost, max_cost):
+    query = text(f"SELECT * FROM real_estate_objects WHERE cost BETWEEN {min_cost} AND {max_cost} ORDER BY id")
+    result = await db.execute(query)
+    return await data_check(result=await crud_transform_json(result=result), db=db)
+
+
+async def data_check(db, result):
+    for count, i in enumerate(result):
+        for _ in i:
+            if _ == 'obj_type_id':
+                result[count]['obj_type_id'] = await crud_get_types_obj(id_obj=result[count]['obj_type_id'], db=db)
+            elif _ == 'district_id':
+                result[count]['district_id'] = await crud_get_districts(id_obj=result[count]['district_id'], db=db)
+            elif _ == 'people_type_id':
+                result[count]['people_type_id'] = await crud_get_people_types(id_obj=result[count]['people_type_id'],
+                                                                              db=db)
+            elif _ == 'deal_type_id':
+                result[count]['deal_type_id'] = await crud_get_deal_types(id_obj=result[count]['deal_type_id'], db=db)
+            elif _ == 'real_estate_object_id':
+                result[count]['real_estate_object_id'] = await crud_get_real_estate_objects(
+                    id_obj=result[count]['real_estate_object_id'], db=db)
+            elif _ == 'buyer_id':
+                result[count]['buyer_id'] = await crud_get_peoples(id_obj=result[count]['buyer_id'], db=db,
+                                                                   people_type_id=1)
+            elif _ == 'salesman_id':
+                result[count]['salesman_id'] = await crud_get_peoples(id_obj=result[count]['salesman_id'], db=db,
+                                                                      people_type_id=2)
+    return result
