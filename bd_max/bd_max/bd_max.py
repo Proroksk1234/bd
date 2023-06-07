@@ -10,7 +10,7 @@ from .crud import crud_get_types_obj, crud_get_deal_types, crud_get_districts, c
     crud_update_people_types, crud_update_peoples, crud_update_deals, crud_delete_object_types, crud_delete_districts, \
     crud_delete_real_estate_objects, crud_delete_deal_types, crud_delete_people_types, crud_delete_peoples, \
     crud_delete_deals, crud_get_all_types_columns, crud_add_columns, crud_delete_columns, select_all_object_sales, \
-    select_real_estate_objects_min_max_cost, select_buyers_salesman, select_dynamic_ceil, select_saldo
+    select_real_estate_objects_min_max_cost, select_buyers_salesman, select_dynamic_ceil, select_saldo, check_value
 
 bd = APIRouter()
 
@@ -139,42 +139,49 @@ async def post_peoples(data: dict = Body(...), db: AsyncSession = Depends(get_db
 
 @bd.post('/post_deals')
 async def post_deals(data: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    await crud_update_real_estate_objects(data={'sold': False}, id_obj=data['real_estate_object_id'], db=db)
+    await crud_update_real_estate_objects(data={'sold': True}, id_obj=data['real_estate_object_id'], db=db)
     await crud_post_deals(data=data, db=db)
 
 
 @bd.put('/update_object_types/{id_obj}')
 async def update_object_types(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
+    data = await check_value(data=data)
     await crud_update_object_types(id_obj=id_obj, data=data, db=db)
 
 
 @bd.put('/update_districts/{id_obj}')
 async def update_districts(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
+    data = await check_value(data=data)
     await crud_update_districts(id_obj=id_obj, data=data, db=db)
 
 
 @bd.put('/update_real_estate_objects/{id_obj}')
 async def update_real_estate_objects(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
+    data = await check_value(data=data)
     await crud_update_real_estate_objects(id_obj=id_obj, data=data, db=db)
 
 
 @bd.put('/update_deal_types/{id_obj}')
 async def update_deal_types(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
+    data = await check_value(data=data)
     await crud_update_deal_types(id_obj=id_obj, data=data, db=db)
 
 
 @bd.put('/update_people_types/{id_obj}')
 async def update_people_types(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
+    data = await check_value(data=data)
     await crud_update_people_types(id_obj=id_obj, data=data, db=db)
 
 
 @bd.put('/update_peoples/{id_obj}')
 async def update_peoples(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
+    data = await check_value(data=data)
     await crud_update_peoples(id_obj=id_obj, data=data, db=db)
 
 
 @bd.put('/update_deals/{id_obj}')
 async def update_deals(id_obj: int, data: dict = Body(...), db: AsyncSession = Depends(get_db)):
+    data = await check_value(data=data)
     await crud_update_deals(id_obj=id_obj, data=data, db=db)
 
 
