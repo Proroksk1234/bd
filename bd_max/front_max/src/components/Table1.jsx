@@ -1,13 +1,17 @@
 import Arrow from "../assets/back-arrow.png";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Input } from "@mantine/core";
+import { Table, Button, Input, Select } from "@mantine/core";
 import axios from "axios";
 
 export const Table1 = () => {
   const navigate = useNavigate();
 
   const [elements, setElements] = useState([]);
+  const [select1, setSelect1] = useState([]);
+  const [selectedObjectType, setSelectedObjectType] = useState("");
+  const [select2, setSelect2] = useState([]);
+  const [selectedDistrict, setSelectedDistrict] = useState("");
   const [editingIds, setEditingIds] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -38,15 +42,13 @@ export const Table1 = () => {
     deleteObj(id);
   };
   const updateObj = (id, updatedElement) => {
-    const district_id = updatedElement.district_id[0].id;
-    const obj_type_id = updatedElement.obj_type_id[0].id;
     const { cost, square, sold, address } = updatedElement;
     const data = {
       cost: Number(cost),
       square: Number(square),
       sold: !!sold,
-      district_id,
-      obj_type_id,
+      district_id: selectedDistrict,
+      obj_type_id: selectedObjectType,
       address,
     };
     console.log(data);
@@ -74,6 +76,24 @@ export const Table1 = () => {
         rowInputs.forEach((input) => {
           editedElement[input.name] = input.value;
         });
+
+        const selectedObject1 = select1.find(
+          (option) => option.value === selectedObjectType
+        );
+        const selectedObject2 = select2.find(
+          (option) => option.value === selectedDistrict
+        );
+        const selectedObjectLabel = selectedObject1
+          ? selectedObject1.label
+          : "";
+        const selectedDistrictLabel = selectedObject2
+          ? selectedObject2.label
+          : "";
+        const objTypeId = [{ object_type: selectedObjectLabel }];
+        const objDistrictId = [{ district: selectedDistrictLabel }];
+
+        editedElement.obj_type_id = objTypeId;
+        editedElement.district_id = objDistrictId;
 
         updateObj(editedElement.id, editedElement);
       }
@@ -130,10 +150,12 @@ export const Table1 = () => {
         </td>
         <td>
           {isEditing ? (
-            <Input
+            <Select
               w={"100px"}
               name="object_type"
-              defaultValue={element.obj_type_id[0].object_type}
+              data={select1}
+              value={selectedObjectType}
+              onChange={setSelectedObjectType}
             />
           ) : (
             element.obj_type_id[0].object_type
@@ -141,10 +163,12 @@ export const Table1 = () => {
         </td>
         <td>
           {isEditing ? (
-            <Input
+            <Select
               w={"100px"}
-              name="object_type"
-              defaultValue={element.district_id[0].district}
+              name="district"
+              data={select2}
+              value={selectedDistrict}
+              onChange={setSelectedDistrict}
             />
           ) : (
             element.district_id[0].district
@@ -171,7 +195,37 @@ export const Table1 = () => {
       });
   };
 
+  const getSelect1 = () => {
+    axios
+      .get("http://localhost:8000/api/get_all_type_obj")
+      .then((response) => {
+        const res = response.data.map((e) => ({
+          value: e.id,
+          label: e.object_type,
+        }));
+        setSelect1(res);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  const getSelect2 = () => {
+    axios
+      .get("http://localhost:8000/api/get_all_districts")
+      .then((response) => {
+        const res = response.data.map((e) => ({
+          value: e.id,
+          label: e.district,
+        }));
+        setSelect2(res);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
   useEffect(() => {
+    getSelect1();
+    getSelect2();
     getRealEstateObjects();
   }, []);
 
