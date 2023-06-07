@@ -11,7 +11,7 @@ export const Request2 = () => {
   const rows = elements.map((element) => (
     <tr key={element.name}>
       <td>{element.object_type}</td>
-      <td>{element.sum}</td>
+      <td>{element.coalesce}</td>
     </tr>
   ));
   const getRealEstateObjects = () => {

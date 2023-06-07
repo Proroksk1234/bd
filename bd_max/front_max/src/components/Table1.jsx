@@ -154,8 +154,8 @@ export const Table1 = () => {
               w={"100px"}
               name="object_type"
               data={select1}
-              value={selectedObjectType}
               onChange={setSelectedObjectType}
+              defaultValue={element.obj_type_id[0].id}
             />
           ) : (
             element.obj_type_id[0].object_type
@@ -167,8 +167,8 @@ export const Table1 = () => {
               w={"100px"}
               name="district"
               data={select2}
-              value={selectedDistrict}
               onChange={setSelectedDistrict}
+              defaultValue={element.district_id[0].id}
             />
           ) : (
             element.district_id[0].district

@@ -1,24 +1,35 @@
 import { Table } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import Arrow from "../../assets/back-arrow.png";
 
 export const Request4 = () => {
   const navigate = useNavigate();
-  const elements = [
-    { position: 6, mass: 12.011, symbol: "C", name: "Carbon" },
-    { position: 7, mass: 14.007, symbol: "N", name: "Nitrogen" },
-    { position: 39, mass: 88.906, symbol: "Y", name: "Yttrium" },
-    { position: 56, mass: 137.33, symbol: "Ba", name: "Barium" },
-    { position: 58, mass: 140.12, symbol: "Ce", name: "Cerium" },
-  ];
+  const [elements, setElements] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const rows = elements.map((element) => (
-    <tr key={element.name}>
-      <td>{element.position}</td>
-      <td>{element.name}</td>
-      <td>{element.symbol}</td>
-      <td>{element.mass}</td>
+    <tr key={element.district}>
+      <td>{element.district}</td>
+      <td>{element.sales_count}</td>
+      <td>{element.year}</td>
     </tr>
   ));
+  const getRealEstateObjects = () => {
+    axios
+      .get("http://localhost:8000/api/dynamic_ceil")
+      .then((response) => {
+        setElements(response.data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  useEffect(() => {
+    getRealEstateObjects();
+  }, []);
   return (
     <div className="req">
       <img
@@ -34,10 +45,9 @@ export const Request4 = () => {
         <Table>
           <thead>
             <tr>
-              <th>Element position</th>
-              <th>Element name</th>
-              <th>Symbol</th>
-              <th>Atomic mass</th>
+              <th>Район</th>
+              <th>Количество продаж</th>
+              <th>Год</th>
             </tr>
           </thead>
           <tbody>{rows}</tbody>

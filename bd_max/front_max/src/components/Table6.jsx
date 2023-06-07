@@ -1,12 +1,23 @@
 import Arrow from "../assets/back-arrow.png";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Input } from "@mantine/core";
+import { Table, Button, Input, Select } from "@mantine/core";
 import axios from "axios";
 export const Table6 = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-
+  const [select1, setSelect1] = useState([]);
+  const [selectedDealType, setSelectedDealType] = useState("");
+  const [select2, setSelect2] = useState([]);
+  const [selectedObjectType, setSelectedObjectType] = useState("");
+  const [label2, setLabel2] = useState("");
+  const [select3, setSelect3] = useState([]);
+  const [selectedBuyerType, setSelectedBuyerType] = useState("");
+  const [label3, setLabel3] = useState("");
+  const [select4, setSelect4] = useState([]);
+  const [label4, setLabel4] = useState("");
+  const [selectedSalesmanType, setSelectedSalesmanType] = useState("");
+  const [isSaved, setIsSaved] = useState(false);
   const [elements, setElements] = useState([]);
   const [editingIds, setEditingIds] = useState([]);
 
@@ -36,20 +47,14 @@ export const Table6 = () => {
     deleteObj(id);
   };
   const updateObj = (id, updatedElement) => {
-  console.log(updatedElement)
-          const buyer_id = updatedElement.buyer_id[0].id;
-    const deal_type_id = updatedElement.deal_type_id[0].id;
-    const real_estate_object_id = updatedElement.real_estate_object_id[0].id;
-    const salesman_id = updatedElement.salesman_id[0].id;
-    const date=updatedElement.date.split("T")[0]
+    const date = updatedElement.date.split("T")[0];
     const data = {
-    buyer_id,
-    deal_type_id,
-    real_estate_object_id,
-    salesman_id,
-    date,
+      buyer_id: selectedBuyerType,
+      deal_type_id: selectedDealType,
+      real_estate_object_id: selectedObjectType,
+      salesman_id: selectedSalesmanType,
+      date,
     };
-    console.log(data);
     axios
       .put(`http://localhost:8000/api/update_deals/${id}`, data)
       .then((response) => {
@@ -74,11 +79,43 @@ export const Table6 = () => {
         rowInputs.forEach((input) => {
           editedElement[input.name] = input.value;
         });
+        const selectedDeal = select1.find(
+          (option) => option.value === selectedDealType
+        );
+        const selectedObj = select2.find(
+          (option) => option.value === selectedObjectType
+        );
+        const selectedBuyer = select3.find(
+          (option) => option.value === selectedBuyerType
+        );
+        const selectedSalesman = select4.find(
+          (option) => option.value === selectedSalesmanType
+        );
+        setLabel2(selectedObj.label);
+        setLabel3(selectedBuyer.label);
+        setLabel4(selectedSalesman.label);
+
+        const selectedDealLabel = selectedDeal ? selectedDeal.label : "";
+        const selectedObjectLabel = selectedObj ? selectedObj.label : "";
+        const selectedBuyerLabel = selectedBuyer ? selectedBuyer.label : "";
+        const selectedSalesmanLabel = selectedSalesman
+          ? selectedSalesman.label
+          : "";
+
+        const objDealId = [{ deal_type: selectedDealLabel }];
+        const objObjectId = [{ object_type: selectedObjectLabel }];
+        const objBuyerId = [{ people_type_id: selectedBuyerLabel }];
+        const objSalesmanId = [{ people_type_id: selectedSalesmanLabel }];
+
+        editedElement.deal_type_id = objDealId;
+        editedElement.real_estate_object_id = objObjectId;
+        editedElement.buyer_id = objBuyerId;
+        editedElement.salesman_id = objSalesmanId;
 
         updateObj(editedElement.id, editedElement);
       }
     });
-
+    setIsSaved(true);
     setEditingIds([]);
   };
 
@@ -101,10 +138,12 @@ export const Table6 = () => {
 
         <td>
           {isEditing ? (
-            <Input
-              w={"100px"}
+            <Select
+              w={"130px"}
               name="deal_type"
-              defaultValue={element.deal_type_id[0].deal_type}
+              data={select1}
+              value={selectedDealType}
+              onChange={setSelectedDealType}
             />
           ) : (
             element.deal_type_id[0].deal_type
@@ -112,176 +151,74 @@ export const Table6 = () => {
         </td>
         <td>
           {isEditing ? (
-            <Input
-              w={"100px"}
+            <Select
+              w={"220px"}
               name="object_type"
-              defaultValue={
-                element.real_estate_object_id[0].obj_type_id[0].object_type
-              }
+              data={select2}
+              value={selectedObjectType}
+              onChange={setSelectedObjectType}
             />
           ) : (
-            element.real_estate_object_id[0].obj_type_id[0].object_type
+            <div>
+              {isSaved ? (
+                <>{label2}</>
+              ) : (
+                <div>
+                  {`${element.real_estate_object_id[0].obj_type_id[0].object_type} 
+                  ${element.real_estate_object_id[0].district_id[0].district} 
+                  ${element.real_estate_object_id[0].address} 
+                  ${element.real_estate_object_id[0].square} 
+                  ${element.real_estate_object_id[0].cost}`}
+                </div>
+              )}
+            </div>
           )}
-          <br />
+        </td>
+        <td>
           {isEditing ? (
-            <Input
+            <Select
               w={"100px"}
-              name="district"
-              defaultValue={
-                element.real_estate_object_id[0].district_id[0].district
-              }
+              name="buyer"
+              data={select3}
+              value={selectedBuyerType}
+              onChange={setSelectedBuyerType}
             />
           ) : (
-            element.real_estate_object_id[0].district_id[0].district
+            <div>
+              {isSaved ? (
+                <>{label3}</>
+              ) : (
+                <>{`${element.buyer_id[0].name} ${element.buyer_id[0].surname}`}</>
+              )}
+            </div>
           )}
-          <br />
+        </td>
+        <td>
           {isEditing ? (
-            <Input
+            <Select
               w={"100px"}
-              name="address"
-              defaultValue={element.real_estate_object_id[0].address}
+              name="salesman"
+              data={select4}
+              value={selectedSalesmanType}
+              onChange={setSelectedSalesmanType}
             />
           ) : (
-            element.real_estate_object_id[0].address
-          )}
-          <br />
-          {isEditing ? (
-            <Input
-              w={"100px"}
-              name="square"
-              defaultValue={element.real_estate_object_id[0].square}
-            />
-          ) : (
-            element.real_estate_object_id[0].square
-          )}
-          <br />
-          {isEditing ? (
-            <Input
-              w={"100px"}
-              name="cost"
-              defaultValue={element.real_estate_object_id[0].cost}
-            />
-          ) : (
-            element.real_estate_object_id[0].cost
-          )}
-          <br />
-          {isEditing ? (
-            <Input
-              w={"100px"}
-              name="sold"
-              defaultValue={element.real_estate_object_id[0].sold}
-            />
-          ) : element.real_estate_object_id[0].sold ? (
-            "Да"
-          ) : (
-            "Нет"
+            <div>
+              {isSaved ? (
+                <>{label4}</>
+              ) : (
+                <>{`${element.salesman_id[0].name} ${element.salesman_id[0].surname}`}</>
+              )}
+            </div>
           )}
         </td>
         <td>
           {isEditing ? (
             <Input
               w={"100px"}
-              name="name"
-              defaultValue={element.buyer_id[0].name}
+              name="date"
+              defaultValue={element.date.split("T")[0]}
             />
-          ) : (
-            element.buyer_id[0].name
-          )}
-          <br />
-          {isEditing ? (
-            <Input
-              w={"100px"}
-              name="surname"
-              defaultValue={element.buyer_id[0].surname}
-            />
-          ) : (
-            element.buyer_id[0].surname
-          )}
-          <br />
-          {isEditing ? (
-            <Input
-              w={"100px"}
-              name="patronymic"
-              defaultValue={element.buyer_id[0].patronymic}
-            />
-          ) : (
-            element.buyer_id[0].patronymic
-          )}
-          <br />
-          {isEditing ? (
-            <Input
-              w={"100px"}
-              name="email"
-              defaultValue={element.buyer_id[0].email}
-            />
-          ) : (
-            element.buyer_id[0].email
-          )}
-          <br />
-          {isEditing ? (
-            <Input
-              w={"100px"}
-              name="cost"
-              defaultValue={element.buyer_id[0].number_phone}
-            />
-          ) : (
-            element.buyer_id[0].number_phone
-          )}
-        </td>
-        <td>
-          {isEditing ? (
-            <Input
-              w={"100px"}
-              name="name"
-              defaultValue={element.salesman_id[0].name}
-            />
-          ) : (
-            element.salesman_id[0].name
-          )}
-          <br />
-          {isEditing ? (
-            <Input
-              w={"100px"}
-              name="surname"
-              defaultValue={element.salesman_id[0].surname}
-            />
-          ) : (
-            element.salesman_id[0].surname
-          )}
-          <br />
-          {isEditing ? (
-            <Input
-              w={"100px"}
-              name="patronymic"
-              defaultValue={element.salesman_id[0].patronymic}
-            />
-          ) : (
-            element.salesman_id[0].patronymic
-          )}
-          <br />
-          {isEditing ? (
-            <Input
-              w={"100px"}
-              name="email"
-              defaultValue={element.salesman_id[0].email}
-            />
-          ) : (
-            element.salesman_id[0].email
-          )}
-          <br />
-          {isEditing ? (
-            <Input
-              w={"100px"}
-              name="cost"
-              defaultValue={element.salesman_id[0].number_phone}
-            />
-          ) : (
-            element.salesman_id[0].number_phone
-          )}
-        </td>
-        <td>
-          {isEditing ? (
-            <Input w={"100px"} name="date" defaultValue={element.date.split("T")[0]} />
           ) : (
             element.date.split("T")[0]
           )}
@@ -305,7 +242,67 @@ export const Table6 = () => {
         console.error(error);
       });
   };
+  const getSelect1 = () => {
+    axios
+      .get("http://localhost:8000/api/get_all_deal_types")
+      .then((response) => {
+        const res = response.data.map((e) => ({
+          value: e.id,
+          label: e.deal_type,
+        }));
+        setSelect1(res);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  const getSelect2 = () => {
+    axios
+      .get("http://localhost:8000/api/get_all_real_estate_objects")
+      .then((response) => {
+        const res = response.data.map((e) => ({
+          value: e.id,
+          label: `${e.obj_type_id[0].object_type} ${e.district_id[0].district} ${e.address} ${e.cost} ${e.square}`,
+        }));
+        setSelect2(res);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  const getSelect3 = () => {
+    axios
+      .get("http://localhost:8000/api/get_all_buyers")
+      .then((response) => {
+        const res = response.data.map((e) => ({
+          value: e.id,
+          label: `${e.name} ${e.surname}`,
+        }));
+        setSelect3(res);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  const getSelect4 = () => {
+    axios
+      .get("http://localhost:8000/api/get_all_salesman")
+      .then((response) => {
+        const res = response.data.map((e) => ({
+          value: e.id,
+          label: `${e.name} ${e.surname}`,
+        }));
+        setSelect4(res);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
   useEffect(() => {
+    getSelect1();
+    getSelect2();
+    getSelect3();
+    getSelect4();
     getRealEstateObjects();
   }, []);
 
