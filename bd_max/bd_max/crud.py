@@ -54,6 +54,13 @@ async def crud_get_real_estate_objects(db, id_obj=None):
     return await data_check(result=await crud_transform_json(result=result), db=db)
 
 
+async def crud_get_real_estate_objects_sales(db):
+    sold = False
+    query = text("SELECT * From real_estate_objects WHERE sold = :sold ORDER BY id")
+    result = await db.execute(query, {"sold": sold})
+    return await data_check(result=await crud_transform_json(result=result), db=db)
+
+
 async def crud_get_peoples(db, people_type_id, id_obj=None):
     if id_obj:
         query = text("SELECT * FROM peoples WHERE id = :id_obj and people_type_id = :people_type_id ORDER BY id")
