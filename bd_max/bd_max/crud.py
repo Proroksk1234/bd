@@ -285,10 +285,10 @@ async def select_all_object_sales(db):
 
 async def select_saldo(db):
     query = text("""
-    SELECT object_types.object_type, SUM(real_estate_objects.cost)
-    FROM real_estate_objects
-    JOIN object_types ON object_types.id = real_estate_objects.obj_type_id
-    GROUP BY object_types.object_type ORDER BY id
+        SELECT object_types.object_type, COALESCE(SUM(real_estate_objects.cost), 0)
+        FROM object_types
+        LEFT JOIN real_estate_objects ON object_types.id = real_estate_objects.obj_type_id
+        GROUP BY object_types.object_type
     """)
     result = await db.execute(query)
     return await data_check(result=await crud_transform_json(result=result), db=db)
@@ -296,11 +296,14 @@ async def select_saldo(db):
 
 async def select_dynamic_ceil(db):
     query = text("""
-        SELECT districts.district, EXTRACT(YEAR FROM deals.date) AS year, COUNT(*)
-        FROM deals
-        JOIN real_estate_objects ON real_estate_objects.id = deals.real_estate_object_id
-        JOIN districts ON districts.id = real_estate_objects.district_id
-        GROUP BY districts.district, year ORDER BY id
+            SELECT EXTRACT(YEAR FROM deals.date) AS year, 
+                   districts.district,
+                   COUNT(*) AS sales_count
+            FROM deals
+            JOIN real_estate_objects ON real_estate_objects.id = deals.real_estate_object_id
+            JOIN districts ON districts.id = real_estate_objects.district_id
+            GROUP BY year, districts.district
+            ORDER BY year, districts.district
         """)
     result = await db.execute(query)
     print(result)
@@ -309,15 +312,11 @@ async def select_dynamic_ceil(db):
 
 async def select_buyers_salesman(db):
     query = text("""
-        SELECT peoples.id, peoples.name, peoples.surname, peoples.patronymic, 
-            buyers.count AS buys_count, sellers.count AS sells_count
-        FROM peoples
-        LEFT JOIN (
-            SELECT buyer_id, COUNT(*) AS count FROM deals GROUP BY buyer_id
-        ) buyers ON buyers.buyer_id = peoples.id
-        LEFT JOIN (
-            SELECT salesman_id, COUNT(*) AS count FROM deals GROUP BY salesman_id
-        ) sellers ON sellers.salesman_id = peoples.id ORDER BY id
+            SELECT peoples.*
+            FROM peoples
+            JOIN people_types ON peoples.people_type_id = people_types.id
+            WHERE people_types.people_type IN ('Покупатель', 'Продавец')
+            ORDER BY peoples.people_type_id, peoples.id
         """)
     result = await db.execute(query)
     return await data_check(result=await crud_transform_json(result=result), db=db)
