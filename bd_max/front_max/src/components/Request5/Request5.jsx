@@ -10,11 +10,10 @@ export const Request5 = () => {
   const [isLoading, setIsLoading] = useState(true);
   const rows = elements.map((element) => (
     <tr key={element.name}>
-      <td>{element.buys_count ? element.buys_count : "0"}</td>
       <td>{element.name}</td>
       <td>{element.surname}</td>
       <td>{element.patronymic}</td>
-      <td>{element.sells_count ? element.sells_count : "0"}</td>
+      <td>{element.people_type_id[0].people_type}</td>
     </tr>
   ));
   const getRealEstateObjects = () => {
@@ -50,11 +49,10 @@ export const Request5 = () => {
           <Table>
             <thead>
               <tr>
-                <th>Количество покупок</th>
                 <th>Имя</th>
                 <th>Фамилия</th>
                 <th>Отчество</th>
-                <th>Количество продаж</th>
+                <th>Кто</th>
               </tr>
             </thead>
             <tbody>{rows}</tbody>

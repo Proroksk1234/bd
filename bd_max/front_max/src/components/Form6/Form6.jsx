@@ -36,7 +36,7 @@ export const Form6 = () => {
         console.error(error);
       });
   };
-
+    
   const getSelect1 = () => {
     axios
       .get("http://localhost:8000/api/get_all_deal_types")
@@ -54,7 +54,7 @@ export const Form6 = () => {
   };
   const getSelect2 = () => {
     axios
-      .get("http://localhost:8000/api/get_all_real_estate_objects")
+      .get("http://localhost:8000/api/get_all_real_estate_objects_sales")
       .then((response) => {
         const res = response.data.map((e) => ({
           value: e.id,

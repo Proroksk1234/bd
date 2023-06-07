@@ -102,8 +102,8 @@ export const Table6 = () => {
           ? selectedSalesman.label
           : "";
 
-        const objDealId = [{ deal_type: selectedDealLabel }];
-        const objObjectId = [{ object_type: selectedObjectLabel }];
+        const objDealId = [{ deal_type_id: selectedDealLabel }];
+        const objObjectId = [{ obj_type_id: selectedObjectLabel }];
         const objBuyerId = [{ people_type_id: selectedBuyerLabel }];
         const objSalesmanId = [{ people_type_id: selectedSalesmanLabel }];
 
