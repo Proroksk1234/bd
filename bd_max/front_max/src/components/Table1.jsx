@@ -42,11 +42,15 @@ export const Table1 = () => {
     deleteObj(id);
   };
   const updateObj = (id, updatedElement) => {
-    const { cost, square, sold, address } = updatedElement;
+    const { cost, square, address } = updatedElement;
+    let { sold } = updatedElement;
+    if (sold === "false" || sold === "true") {
+      sold = false;
+    }
     const data = {
       cost: Number(cost),
       square: Number(square),
-      sold: !!sold,
+      sold,
       district_id: selectedDistrict,
       obj_type_id: selectedObjectType,
       address,
