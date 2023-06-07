@@ -138,10 +138,15 @@ async def crud_post_peoples(data: dict, db):
 
 
 async def crud_post_deals(data: dict, db):
+    async def crud_post_deals(data: dict, db):
     for key, value in data.items():
-        if isinstance(value, datetime):
-            data[key] = value.isoformat()
-
+        if key == 'date':
+            data[key] = datetime.strptime(value, '%Y-%m-%d').date()
+    fields = ','.join(data.keys())
+    placeholders = ','.join(f':{key}' for key in data.keys())
+    query_text = text(f"INSERT INTO deals ({fields}) VALUES ({placeholders})")
+    await db.execute(query_text, data)
+    await db.commit()
     fields = ','.join(data.keys())
     placeholders = ','.join(f':{key}' for key in data.keys())
     query_text = text(f"INSERT INTO deals ({fields}) VALUES ({placeholders})")
