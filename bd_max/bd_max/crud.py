@@ -146,7 +146,6 @@ async def crud_post_deals(data: dict, db):
     query_text = text(f"INSERT INTO deals ({fields}) VALUES ({placeholders})")
     await db.execute(query_text, data)
     await db.commit()
-    
 
 
 async def crud_update_object_types(data: dict, id_obj, db):
@@ -199,7 +198,7 @@ async def crud_update_peoples(data: dict, id_obj, db):
 
 async def crud_update_deals(data: dict, id_obj, db):
     for key, value in data.items():
-        if key =='date':
+        if key == 'date':
             data[key] = datetime.strptime(value, '%Y-%m-%d').date()
     set_clause = ', '.join([f"{key} = :{key}" for key in data.keys()])
     query_text = f"UPDATE deals SET {set_clause} WHERE id=:id_obj"
@@ -348,3 +347,12 @@ async def data_check(db, result):
                 result[count]['salesman_id'] = await crud_get_peoples(id_obj=result[count]['salesman_id'], db=db,
                                                                       people_type_id=2)
     return result
+
+
+async def check_value(data):
+    for key, value in data.items():
+        if value == 'Информация отсутствует':
+            data[key] = None
+        if '_id' in key and type(value) == str:
+            data.pop(key, None)
+    return data
