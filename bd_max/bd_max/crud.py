@@ -106,7 +106,6 @@ async def crud_post_districts(data: dict, db):
 
 
 async def crud_post_real_estate_objects(data: dict, db):
-    data['sold'] = False
     fields = ','.join(data.keys())
     placeholders = ','.join(f':{key}' for key in data.keys())
     query_text = text(f"INSERT INTO real_estate_objects ({fields}) VALUES ({placeholders})")
@@ -139,7 +138,6 @@ async def crud_post_peoples(data: dict, db):
 
 
 async def crud_post_deals(data: dict, db):
-    data['sold'] = True
     for key, value in data.items():
         if isinstance(value, datetime):
             data[key] = value.isoformat()
