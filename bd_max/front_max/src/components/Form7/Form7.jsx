@@ -9,6 +9,10 @@ export const Form7 = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (!narea) {
+      alert("Пожалуйста, заполните все поля!");
+      return;
+    }
     const data = { district: area };
     axios
       .post("http://localhost:8000/api/post_districts", data)

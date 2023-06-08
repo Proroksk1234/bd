@@ -13,6 +13,28 @@ export const Form5 = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (!name) {
+      alert("Пожалуйста, введите имя");
+      return;
+    }
+
+    if (!lastName) {
+      alert("Пожалуйста, введите фамилию");
+      return;
+    }
+    if (!patronymic) {
+      alert("Пожалуйста, введите отчество");
+      return;
+    }
+    if (!email || !email.includes("@")) {
+      alert("Пожалуйста, введите правильную почту");
+      return;
+    }
+
+    if (!phone || !/^\d+$/.test(phone)) {
+      alert("Пожалуйста, введите правильный номер телефона");
+      return;
+    }
     const data = {
       name: name,
       surname: lastName,

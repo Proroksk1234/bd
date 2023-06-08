@@ -9,6 +9,10 @@ export const Form3 = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (!name) {
+      alert("Пожалуйста, заполните все поля!");
+      return;
+    }
     const data = { deal_type: name };
     axios
       .post("http://localhost:8000/api/post_deal_types", data)

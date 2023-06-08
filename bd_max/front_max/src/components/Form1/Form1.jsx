@@ -17,6 +17,18 @@ export const Form1 = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (
+      !area ||
+      !objType ||
+      !adres ||
+      !square ||
+      isNaN(square) ||
+      !sell ||
+      isNaN(sell)
+    ) {
+      alert("Пожалуйста, заполните все поля!");
+      return;
+    }
     const data = {
       address: adres,
       cost: Number(sell),

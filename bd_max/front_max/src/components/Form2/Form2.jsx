@@ -9,6 +9,10 @@ export const Form2 = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (!name) {
+      alert("Пожалуйста, заполните все поля!");
+      return;
+    }
     const data = { object_type: name };
     axios
       .post("http://localhost:8000/api/post_object_types", data)

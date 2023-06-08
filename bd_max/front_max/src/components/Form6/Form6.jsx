@@ -19,6 +19,34 @@ export const Form6 = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (!deal) {
+      alert("Пожалуйста, выберите тип сделки");
+      return;
+    }
+    if (!object) {
+      alert("Пожалуйста, выберите объект недвижимости");
+      return;
+    }
+    if (!buyer) {
+      alert("Пожалуйста, выберите покупателя");
+      return;
+    }
+    if (!seller) {
+      alert("Пожалуйста, выберите продавца");
+      return;
+    }
+    if (!date || isNaN(Date.parse(date))) {
+      alert("Пожалуйста, введите правильную дату");
+      return;
+    }
+    const date1 = "2023-06-08";
+    const dateObj1 = new Date(date1);
+    const dateObj2 = new Date(date);
+    console.log(dateObj1, dateObj2);
+    if (dateObj2 > dateObj1) {
+      alert("Введите корректную дату, пожалуйста!");
+      return;
+    }
     const data = {
       deal_type_id: deal,
       real_estate_object_id: object,
@@ -36,7 +64,7 @@ export const Form6 = () => {
         console.error(error);
       });
   };
-    
+
   const getSelect1 = () => {
     axios
       .get("http://localhost:8000/api/get_all_deal_types")
